@@ -32,14 +32,16 @@ class Max3satHamiltonian:
         for i in range(self.formula.nv):
             if self.single_terms[i] != 0:
                 substring = self.__pauli_string([i])
-                pauli_list.append([self.single_terms[i], substring])
+                pauli_list.append((self.single_terms[i], substring, (i, )))
             for j in range(i + 1, self.formula.nv):
                 if self.quadratic_terms[i][j] != 0:
                     substring = self.__pauli_string([i, j])
-                    pauli_list.append([self.quadratic_terms[i][j], substring])
+                    pauli_list.append((self.quadratic_terms[i][j], substring, (i, j)))
                 for k in range(j + 1, self.formula.nv):
                     if self.cubic_terms[i][j][k] != 0:
                         substring = self.__pauli_string([i, j, k])
-                        pauli_list.append([self.cubic_terms[i][j][k], substring])
+                        pauli_list.append((self.cubic_terms[i][j][k], substring, (i, j, k)))
         return pauli_list
+
+    
                         
