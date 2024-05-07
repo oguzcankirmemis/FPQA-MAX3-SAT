@@ -1,3 +1,4 @@
+from qiskit.quantum_info import SparsePauliOp
 from pysat.formula import CNF
 import numpy as np
 
@@ -43,5 +44,13 @@ class Max3satHamiltonian:
                         pauli_list.append((self.cubic_terms[i][j][k], substring, (i, j, k)))
         return pauli_list
 
+    def get_sparse_pauli_operator(self):
+        pauli_list = self.get_pauli_list()
+        data, coeffs = [], []
+        for coeff, pauli_str, qubits in pauli_list:
+            data.append(pauli_str)
+            coeffs.append(coeff)
+        return SparsePauliOp(data, coeffs=coeffs)
+    
     
                         
