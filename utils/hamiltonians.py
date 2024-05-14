@@ -26,7 +26,6 @@ class Max3satHamiltonian:
         for i in indices:
             pauli_string[i] = "Z"
         return "".join(pauli_string)
-
     
     def get_pauli_list(self):
         pauli_list = []
