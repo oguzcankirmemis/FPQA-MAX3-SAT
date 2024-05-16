@@ -1,3 +1,6 @@
 Name,Hardware,QAOA Depth,Average Circuit Depth,Ideal Fidelity,Ideal Estimated Shots,Fidelity with Decoherence,Estimated Shots with Decoherence for 2/3 Success Rate,Fidelity without Decoherence,Estimated Shots without Decoherence for 2/3 Success Rate,Average Swap Overhead,Average Number of Two Qubit Gates,Iterations
-uf20-01.cnf,ibm_sherbrooke,1,2437.5,6.437716848693121e-07,1843287.328473471,1.0729063631328859e-11,407092293088.93005,0.0001417282266728636,18254.793373164357,331,1287,2
-uuf50-02.cnf,ibm_sherbrooke,1,9413.5,4.1135174456542275e-33,-inf,0.0,-inf,0.0,-inf,1942,6708,2
+uf20-01.cnf,ibm_sherbrooke,1,2511.6,7.831618782920788e-07,1494248.4186868765,5.8057467276588055e-11,156135573330.1517,0.00041420625678039125,3372.2406836262016,327,1277,10
+uuf50-01.cnf,ibm_sherbrooke,1,8449.7,5.061086478122046e-31,-inf,3.8957654374802695e-69,-inf,1.6866289591982036e-26,-inf,1841,6386,10
+uuf75-01.cnf,ibm_sherbrooke,1,14325.6,3.985309275953176e-61,-inf,0.0,-inf,0.0,-inf,3793,12778,10
+uuf100-01.cnf,ibm_sherbrooke,1,20762.0,5.6159256945021255e-98,-inf,0.0,-inf,0.0,-inf,6278,20762,10
+uuf125-01.cnf,ibm_sherbrooke,1,26560.6,6.266132309394909e-141,-inf,0.0,-inf,0.0,-inf,9221,30127,10
