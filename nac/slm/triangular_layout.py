@@ -1,9 +1,10 @@
 from math import sqrt
-from slm.base import SLM
+from nac.slm.base import SLM
 from nac.slm.trap import Trap
+from nac.atom import Atom
 
 class TriangularLayout(SLM):
-    def __init__(self, rows: int, cols: int):
+    def __init__(self, distance: float, rows: int, cols: int):
         if distance <= 0:
             raise ValueError("Invalid distance.")
         if rows <= 0:
@@ -13,13 +14,22 @@ class TriangularLayout(SLM):
         xy_distance = distance / sqrt(2)
         self.traps = [
             [
-                Trap(col * xy_distance + xy_distance if row % 2 == 0 else 0, row * xy_distance, False) 
+                Trap(col * distance + xy_distance if row % 2 == 1 else col * distance, row * xy_distance, None) 
                 for col in range(cols)
             ] 
-            for row in rows
+            for row in range(rows)
         ]
 
-    def toggle(self, x: int, y: int):
-        self.traps[y][x].has_atom = not self.traps[y][x].has_atom
+    def set_trap(self, x: int, y: int, atom: Atom | None):
+        self.traps[y][x].atom = atom
+
+    def get_atom_at_trap(self, x: int, y: int) -> Atom | None:
+        return self.traps[y][x].atom
+
+    def occupied(self, x: int, y: int) -> bool:
+        return self.traps[y][x].atom != None
+
+    def position(self, x: int, y: int) -> tuple[int]:
+        return self.traps[y][x].x, self.traps[y][x].y
         
         
