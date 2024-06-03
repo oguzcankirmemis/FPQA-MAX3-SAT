@@ -2,26 +2,10 @@ from math import pow
 from nac.atom import Atom
 from nac.slm.base import SLM
 from nac.aod import AOD
-
-_TRAP_TRANSFER_PROXIMITY = 1e-05
-_AOD_BEAM_PROXIMITY = 1e-03
+from nac.config import FPQAConfig
 
 class FPQA:
-    U3_GATE_FIDELITY = 0.999
-    U3_GATE_DURATION = 0.5
-    CZ_GATE_FIDELITY = 0.995
-    CZ_GATE_DURATION = 0.2
-    CCZ_GATE_FIDELITY = 0.98
-    CCZ_GATE_DURATION = 1
-    QUBIT_DECAY=1e08
-    QUBIT_DEPHASING=1.5e06
-    SHUTTLE_FIDELITY=1
-    SHUTTLING_SPEED = 0.55
-    TRAP_SWAPPING = 20
-    INTERACTION_RADIUS = 2.0
-    RESTRICTION_RADIUS = 4.0
-    
-    def __init__(self,  slm: SLM, aod: AOD, atoms: list[Atom], ccz_gate_fidelity=0.98):
+    def __init__(self,  slm: SLM, aod: AOD, atoms: list[Atom], config: FPQAConfig):
         self.aod = aod
         self.slm = slm
         self.atoms = atoms
@@ -34,7 +18,7 @@ class FPQA:
                 if self.aod.occupied(atom.col, atom.row):
                     raise ValueError("AOD Trap already occupied.")
                 self.aod.set_trap(atom.col, atom.row, atom)
-        self.CCZ_GATE_FIDELITY = ccz_gate_fidelity
+        self.config = config
 
     def get_atom(self, index: int) -> Atom:
         return self.atoms[index]
