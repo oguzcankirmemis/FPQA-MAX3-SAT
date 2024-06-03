@@ -9,10 +9,11 @@ _NOISE_DEFAULTS = {
     "cx": (7.992e-08, 8.99988e-07, 1e-5, 5e-3),
     "ecr": (7.992e-08, 8.99988e-07, 1e-5, 5e-3),
     "cz": (7.992e-08, 8.99988e-07, 1e-5, 5e-3),
-    "id": (2.997e-08, 5.994e-08, 9e-5, 1e-4),
+    "id": (2.997e-08, 5.994e-08, 9e-5, 1e-3),
     "rz": (0.0, 0.0),
-    "sx": (2.997e-08, 5.994e-08, 9e-5, 1e-4),
-    "x": (2.997e-08, 5.994e-08, 9e-5, 1e-4),
+    "sx": (2.997e-08, 5.994e-08, 9e-5, 1e-3),
+    "x": (2.997e-08, 5.994e-08, 9e-5, 1e-3),
+    "u3": (2.997e-08, 5.994e-08, 9e-5, 1e-3),
     "measure": (6.99966e-07, 1.500054e-06, 1e-5, 5e-3),
     "delay": (None, None),
     "reset": (None, None),
@@ -118,17 +119,19 @@ def create_fake_heavy_hex_backend(
 ) -> NoisyFakeBackend:
     noise_settings = {
         "ecr": (two_qubit_gate_duration, two_qubit_gate_error),
+        "cz": (two_qubit_gate_duration, two_qubit_gate_error),
         "rz": (one_qubit_gate_duration, one_qubit_gate_error),
         "sx": (one_qubit_gate_duration, one_qubit_gate_error),
         "x": (one_qubit_gate_duration, one_qubit_gate_error),
         "id": (one_qubit_gate_duration, one_qubit_gate_error),
+        "u3": (one_qubit_gate_duration, one_qubit_gate_error),
         "delay": (0, 0),
         "reset": (0, 0),
         "measure": (readout_duration, readout_error),
         "t1": t1,
         "t2": t2
     }
-    basis_gates=["id", "rz", "sx", "x", "ecr", "reset", "delay", "measure"]
+    basis_gates=["id", "rz", "sx", "x", "u3", "cz", "ecr", "reset", "delay", "measure"]
     num_qubits_row = 4 * columns + 3
     num_qubits_between_rows = columns + 1
     num_qubits = _get_heavy_hex_row_qubit_id(rows, num_qubits_row - 3, num_qubits_row, num_qubits_between_rows) + 1

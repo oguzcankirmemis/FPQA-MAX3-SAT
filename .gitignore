@@ -122,6 +122,8 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv-fpqa
+.virtual_documents
 env/
 venv/
 ENV/

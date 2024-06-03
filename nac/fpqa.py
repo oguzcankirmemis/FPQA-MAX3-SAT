@@ -21,8 +21,7 @@ class FPQA:
     INTERACTION_RADIUS = 2.0
     RESTRICTION_RADIUS = 4.0
     
-    
-    def __init__(self,  slm: SLM, aod: AOD, atoms: list[Atom]):
+    def __init__(self,  slm: SLM, aod: AOD, atoms: list[Atom], ccz_gate_fidelity=0.98):
         self.aod = aod
         self.slm = slm
         self.atoms = atoms
@@ -35,6 +34,7 @@ class FPQA:
                 if self.aod.occupied(atom.col, atom.row):
                     raise ValueError("AOD Trap already occupied.")
                 self.aod.set_trap(atom.col, atom.row, atom)
+        self.CCZ_GATE_FIDELITY = ccz_gate_fidelity
 
     def get_atom(self, index: int) -> Atom:
         return self.atoms[index]

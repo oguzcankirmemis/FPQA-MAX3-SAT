@@ -10,3 +10,4 @@ class Atom:
         self.row = row
         self.col = col
         
+        

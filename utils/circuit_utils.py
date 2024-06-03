@@ -8,9 +8,9 @@ def calculate_expected_fidelity(circuit, backend):
     fidelity = 1
     decoherence_fidelity = 1
     for gate in dag.gate_nodes():
-        if gate.name == "ecr":
+        if gate.name in ("ecr", "cx", "cz"):
             q1, q2 = gate.qargs[0]._index, gate.qargs[1]._index
-            fidelity *= (1 - backend.target["ecr"][(q1, q2)].error)
+            fidelity *= (1 - backend.target[gate.name][(q1, q2)].error)
         else:
             q = gate.qargs[0]._index
             fidelity *= (1 - backend.target[gate.name][(q,)].error)
@@ -19,10 +19,10 @@ def calculate_expected_fidelity(circuit, backend):
         for gate in dag.nodes_on_wire(wire, only_ops=True):
             if gate.name == "barrier":
                 continue
-            elif gate.name == "ecr":
+            elif gate.name in ("ecr", "cx", "cz"):
                 q1, q2 = gate.qargs[0]._index, gate.qargs[1]._index
                 q = gate.qargs[0]._index
-                duration += backend.target["ecr"][(q1, q2)].duration
+                duration += backend.target[gate.name][(q1, q2)].duration
             else:
                 q = gate.qargs[0]._index
                 duration += backend.target[gate.name][(q,)].duration
@@ -39,12 +39,12 @@ def calculate_expected_fidelity_ideal(circuit, two_qubit_gate_fidelity=0.995, si
     dag = circuit_to_dag(circuit)
     fidelity = 1
     for gate in dag.gate_nodes():
-        if gate.name == "ecr":
+        if gate.name in ("ecr", "cx", "cz"):
             fidelity *= two_qubit_gate_fidelity
         elif gate.name == "measure" or gate.name == "barrier":
             continue
         else:
-            fidelity *= single_qubit_gate_fidelity  
+            fidelity *= single_qubit_gate_fidelity
     estimated_shots = np.log(1 - DESIRED_SUCCESS_PROBABILITY) / np.log(1 - fidelity)
     return fidelity, estimated_shots
 
