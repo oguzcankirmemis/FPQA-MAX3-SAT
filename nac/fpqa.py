@@ -1,4 +1,4 @@
-from math import pow
+from math import pow, sqrt
 from nac.atom import Atom
 from nac.slm.base import SLM
 from nac.aod import AOD
@@ -69,6 +69,22 @@ class FPQA:
             aod_atom.assign_trap(True, slm_row, slm_column)
         if slm_atom is not None:
             slm_atom.assign_trap(False, aod_row, aod_column)
+
+    def is_interacting(self, atom1: Atom, atom2: Atom) -> bool:
+        pos1 = 0.0, 0.0
+        if atom1.is_slm:
+            pos1 = self.slm.position(self.atom.col, self.atom.row)
+        else:
+            pos1 = self.aod.position(self.atom.col, self.atom.row)
+        pos2 = 0.0, 0.0
+        if atom2.is_slm:
+            pos2 = self.slm.position(self.atom.col, self.atom.row)
+        else:
+            pos2 = self.aod.position(self.atom.col, self.atom.row)
+        dx = pos1[0] - pos2[0]
+        dy = pos1[1] - pos2[1]
+        distance = sqrt(dx * dx + dy * dy)
+        return distance <= self.config["INTERACTION_RADIUS"]
 
     def apply_local_raman(self):
         pass

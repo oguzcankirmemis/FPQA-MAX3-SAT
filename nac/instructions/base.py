@@ -3,23 +3,23 @@ from nac.fpqa import FPQA
 
 class Instruction(ABC):
     @abstractmethod
-    def apply(fpqa: FPQA):
+    def apply():
         pass
 
     @abstractmethod
-    def verify(fpqa: FPQA) -> bool:
+    def verify() -> bool:
         pass
 
     @abstractmethod
-    def qasm(fpqa: FPQA) -> str:
+    def qasm() -> str:
         pass
 
     @abstractmethod
-    def avg_fidelity(fpqa: FPQA) -> float:
+    def avg_fidelity() -> float:
         pass
 
     @abstractmethod
-    def duration(fpqa: FPQA) -> float:
+    def duration() -> float:
         pass
 
     
