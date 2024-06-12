@@ -20,7 +20,7 @@ class Rydberg(Instruction):
         return True
 
     def qasm(self) -> str:
-        lines = ["@rydberg", f"gate {self.gate_name} {", ".join(self.atoms)} \{"]
+        lines = ["@rydberg", f"gate {self.gate_name} {", ".join(self.atoms)} {{"]
         for gate in self.gates:
             if len(gate) == 2:
                 lines.append(f"CZ {gate[0]}, {gate[1]};")
