@@ -1,20 +1,18 @@
 from nac.fpqa import FPQA
 from nac.instructions.base import Instruction
 
-_rydberg_gate_id = 0
+_global_rydberg_gate_id = 0
 
 class Rydberg(Instruction):
     def __init__(self, fpqa: FPQA):
         self.fpqa = fpqa
-        if not self.verify():
-            raise ValueError(f"Cannot apply global Rydberg interaction in current FPQA setting.")
-        self.gates, self.atoms = self.get_gates_and_atoms()
-        self.gate_name = f"rydberg_{_rydberg_gate_id}"
-        _rydberg_gate_id += 1
-        self.apply()
+        self.gate_name = f"global_rydberg_{_rydberg_gate_id}"
+        _global_rydberg_gate_id += 1
         
     def apply(self):
-        pass
+        if not self.verify():
+            raise ValueError("Cannot apply global Rydberg pulse in current FPQA setting.")
+        self.gates, self.atoms = self.get_gates_and_atoms()
 
     def verify(self) -> bool:
         return True
@@ -45,7 +43,7 @@ class Rydberg(Instruction):
                 return self.fpqa.config["CCZ_GATE_DURATION"]
         return self.fpqa.config["CZ_GATE_DURATION"]
 
-    def get_gates_and_atoms(self) -> list[tuple]:
+    def get_gates_and_atoms(self) -> tuple[set, set]:
         parents = {atom.id: set([atom.id]) for atom in fpqa.atoms}
         for i in range(len(self.atoms)):
             for j in range(i + 1, len(self.atoms)):
@@ -65,7 +63,7 @@ class Rydberg(Instruction):
             if len(interacting_atoms > 1):
                 gates.add(tuple(parents[atom]))
                 atoms = atoms.union(parents[atom])
-        return gates
+        return gates, atoms
             
                 
     
