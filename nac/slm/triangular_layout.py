@@ -22,6 +22,8 @@ class TriangularLayout(SLM):
 
     def set_trap(self, x: int, y: int, atom: Atom | None):
         self.traps[y][x].atom = atom
+        if atom is not None:
+            atom.assign_trap(True, y, x)
 
     def get_atom_at_trap(self, x: int, y: int) -> Atom | None:
         return self.traps[y][x].atom

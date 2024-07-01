@@ -8,6 +8,8 @@ class AOD:
 
     def set_trap(self, x: int, y: int, atom: Atom | None):
         self.atom_map[y][x] = atom
+        if atom is not None:
+            atom.assign_trap(False, y, x)
 
     def get_atom_at_trap(self, x: int, y: int) -> Atom | None:
         return self.atom_map[y][x]

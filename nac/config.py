@@ -11,6 +11,7 @@ defaults = {
     "SHUTTLE_FIDELITY": 1,
     "SHUTTLING_SPEED": 0.55, # in micrometers/microseconds
     "TRAP_SWAP_DURATION": 20,
+    "TRAP_SWAP_FIDELITY": 1.0,
     "INTERACTION_RADIUS": 2.0, # in micrometers
     "RESTRICTION_RADIUS": 4.0 # in micrometers
     "TRAP_TRANSFER_PROXIMITY": 1e-05, # in micrometers

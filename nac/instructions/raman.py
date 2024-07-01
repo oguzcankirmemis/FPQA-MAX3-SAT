@@ -29,7 +29,7 @@ class LocalRaman(Instruction):
     def avg_fidelity(self) -> float:
         return self.fpqa.config["U3_GATE_FIDELITY"]
 
-    def duration() -> float:
+    def duration(self) -> float:
         return self.fpqa.config["U3_GATE_DURATION"]
 
 class GlobalRaman(Instruction):
@@ -47,13 +47,13 @@ class GlobalRaman(Instruction):
     def verify(self) -> bool:
         return True
 
-    def qasm() -> str:
+    def qasm(self) -> str:
         lines = [f"@raman global ({self.x_angle}, {self.y_angle}, {self.z_angle})",
                  f"u3_global({self.x_angle}, {self.y_angle}, {self.z_angle}) {", ".join([f"q[{atom.id}]" for atom in self.fpqa.atoms])};"]
         return "\n".join(lines)
 
-    def avg_fidelity() -> float:
+    def avg_fidelity(self) -> float:
         return self.fpqa.config["U3_GATE_FIDELITY"] ** len(self.fpqa.atoms)
 
-    def duration() -> float:
+    def duration(self) -> float:
         return self.fpqa.config["U3_GATE_DURATION"]
