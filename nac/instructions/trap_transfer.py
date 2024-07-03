@@ -2,7 +2,7 @@ from nac.instructions.base import Instruction
 from nac.fpqa import FPQA
 
 class TrapTransfer(Instruction):
-    def __init__(fpqa: FPQA, slm_row: int, slm_col: int, aod_row: int, aod_col: int):
+    def __init__(self, fpqa: FPQA, slm_row: int, slm_col: int, aod_row: int, aod_col: int):
         self.fpqa = fpqa
         self.slm_row = slm_row
         self.slm_col = slm_col

@@ -2,7 +2,7 @@ from nac.instructions.base import Instruction
 from nac.fpqa import FPQA
 
 class Shuttle(Instruction):
-    def __init__(fpqa: FPQA, is_row: bool, index: int, offset: float):
+    def __init__(self, fpqa: FPQA, is_row: bool, index: int, offset: float):
         self.fpqa = fpqa
         self.is_row = is_row
         self.index = index

@@ -3,7 +3,7 @@ from nac.fpqa import FPQA
 from nac.atom import Atom
 
 class LocalRaman(Instruction):
-    def __init__(fpqa: FPQA, atom: Atom, x_angle: float, y_angle: float, z_angle: float):
+    def __init__(self, fpqa: FPQA, atom: Atom, x_angle: float, y_angle: float, z_angle: float):
         self.fpqa = fqpa
         self.atom = atom
         self.x_angle = x_angle
@@ -33,7 +33,7 @@ class LocalRaman(Instruction):
         return self.fpqa.config["U3_GATE_DURATION"]
 
 class GlobalRaman(Instruction):
-    def __init__(fpqa: FPQA, x_angle: float, y_angle: float, z_angle: float):
+    def __init__(self, fpqa: FPQA, x_angle: float, y_angle: float, z_angle: float):
         self.fpqa = fpqa
         self.x_angle = x_angle
         self.y_angle = y_angle
