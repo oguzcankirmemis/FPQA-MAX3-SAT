@@ -12,7 +12,7 @@ class Shuttle(Instruction):
         if not self.verify():
             raise ValueError("Cannot apply shuttle in current FPQA setting")
         if self.is_row:
-            self.fpqa.aod.rows[self.index += offset
+            self.fpqa.aod.rows[self.index] += offset
         else:
             self.fpqa.aod.cols[self.index] += offset
     
@@ -50,8 +50,8 @@ class Shuttle(Instruction):
         return True
 
     def qasm(self) -> str:
-        row_or_col = "row" if self.is_row else "col"
-        return f"@shuttle {row_or_col} {self.index} {self.offset}"
+        array_type = "row" if self.is_row else "col"
+        return f"@shuttle {array_type} {self.index} {self.offset}\n"
 
     def avg_fidelity() -> float:
         return self.fpqa.config["SHUTTLING_FIDELITY"]

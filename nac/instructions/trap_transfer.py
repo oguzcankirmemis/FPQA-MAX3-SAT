@@ -32,7 +32,7 @@ class TrapTransfer(Instruction):
 
     def qasm(self) -> str:
         slm_index = self.slm_col * len(self.slm.traps) + self.slm_row
-        return f"@transfer {slm_index} ({self.aod_col}, {self.aod_row})"
+        return f"@transfer {slm_index} ({self.aod_col}, {self.aod_row})\n"
 
     def avg_fidelity(self) -> float:
         return self.fpqa.config["TRAP_SWAP_FIDELITY"]

@@ -25,7 +25,7 @@ class Rydberg(Instruction):
             if len(gate) == 3:
                 lines.append(f"ctrl(2) @ U(0, 0, π) q[{gate[0]}], q[{gate[1]}], q[{gate[2]}];")
         lines.append("}")
-        lines.append(f"{self.gate_name} {", ".join(self.atoms)}")
+        lines.append(f"{self.gate_name} {", ".join(self.atoms)}\n")
         return "\n".join(lines)
 
     def avg_fidelity(self) -> float:

@@ -23,7 +23,7 @@ class LocalRaman(Instruction):
 
     def qasm(self) -> str:
         lines = [f"@raman local q[{self.atom.id}] ({self.x_angle}, {self.y_angle}, {self.z_angle})",
-                f"U({self.x_angle}, {self.y_angle}, {self.z_angle}) q[{self.atom.id}]"]
+                f"U({self.x_angle}, {self.y_angle}, {self.z_angle}) q[{self.atom.id}]\n"]
         return "\n".join(lines)
 
     def avg_fidelity(self) -> float:
@@ -49,7 +49,7 @@ class GlobalRaman(Instruction):
 
     def qasm(self) -> str:
         lines = [f"@raman global ({self.x_angle}, {self.y_angle}, {self.z_angle})",
-                 f"u3_global({self.x_angle}, {self.y_angle}, {self.z_angle}) {", ".join([f"q[{atom.id}]" for atom in self.fpqa.atoms])};"]
+                 f"u3_global({self.x_angle}, {self.y_angle}, {self.z_angle}) {", ".join([f"q[{atom.id}]" for atom in self.fpqa.atoms])};\n"]
         return "\n".join(lines)
 
     def avg_fidelity(self) -> float:
