@@ -6,16 +6,19 @@ class AODInit(Instruction):
         self.fpqa = fpqa
 
     def apply(self):
-        pass
+        if not self.verify():
+            raise ValueError("Cannot apply aod init in current FPQA setting")
 
     def verify(self) -> bool:
-        pass
+        return True
 
     def qasm(self) -> str:
-        pass
+        rows = f"[{", ".join(self.fpqa.aod.rows)}]"
+        cols = f"[{", ".join(self.fpqa.aod.cols)}]"
+        return f"@aod {cols} {rows}"
 
     def avg_fidelity(self) -> float:
-        pass
+        return 1.0
 
     def duration() -> float:
-        pass
+        return 0.0

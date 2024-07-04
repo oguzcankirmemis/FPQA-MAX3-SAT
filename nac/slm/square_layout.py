@@ -29,3 +29,11 @@ class SquareGrid(SLM):
 
     def position(self, x: int, y: int) -> tuple[int]:
         return self.traps[y][x].x, self.traps[y][x].y
+
+    def trap_list(self) -> list[Trap]:
+        return [
+            trap 
+            for trap in column 
+            for column in self.traps
+        ]
+        

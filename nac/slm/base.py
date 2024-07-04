@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from nac.atom import Atom
+from nac.slm.trap import Trap
 
 class SLM(ABC):
     @abstractmethod
@@ -16,4 +17,8 @@ class SLM(ABC):
 
     @abstractmethod
     def position(self, x: int, y: int) -> tuple[int]:
+        pass
+
+    @abstractmethod
+    def trap_list(self) -> list[Trap]:
         pass
