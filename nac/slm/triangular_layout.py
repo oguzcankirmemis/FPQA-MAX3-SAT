@@ -40,5 +40,3 @@ class TriangularLayout(SLM):
             for trap in column 
             for column in self.traps
         ]
-        
-        

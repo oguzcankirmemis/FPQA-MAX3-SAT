@@ -29,6 +29,7 @@ def get_color_map(formula: CNF) -> list[int]:
     color_map[0] = 0
     colored = set([0])
     uncolored = set(i for i in range(1, len(formula.clauses)))
+    num_colors = 1
     while len(uncolored) > 0:
         choosen, curr_saturation = -1, 0 
         for clause in uncolored:
@@ -50,4 +51,5 @@ def get_color_map(formula: CNF) -> list[int]:
                 prev_used_color = curr_used_color
             colored.add(choosen)
             uncolored.remove(chosen)
-    return color_map
+            num_colors = max(num_colors, color_map[chosen] + 1)
+    return num_colors, color_map
