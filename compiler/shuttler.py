@@ -2,6 +2,7 @@ from nac.fpqa import FPQA
 from nac.atom import Atom
 from nac.instructions.base import Instruction
 from nac.instructions.shuttle import Shuttle
+from nac.instructions.parallel import Parallel
 from compiler.mapper import MAX3SATQAOAMapper
 from pysat.formula import CNF
 
@@ -12,6 +13,7 @@ class MAX3SATQAOAShuttler:
         self.formula = formula
     
     def shuttle_color(self, color: int) -> list[Instruction]:
+        shuttle_program = []
         atom_map = self.mapper.get_atom_map()
         rev_atom_map = [None for _ in range(len(self.fpqa.atoms))]
         for atom in range(len(atom_map)):
@@ -39,7 +41,8 @@ class MAX3SATQAOAShuttler:
                 shuttle_map[literal] = False
             num_shuttle += 3
         while num_shuttle > 0:
-            trap_switches = 
+            trap_switches_up = set()
+            trap_switches_down = set()
             instructions = []
             for c in len(self.fpqa.aod.cols):
                 atom = self.fpqa.aod.get_atom_at_trap(c, 0)
@@ -53,6 +56,14 @@ class MAX3SATQAOAShuttler:
                     last_x = trap.x
                     instruction = Shuttle(self.fpqa, False, trap.x - self.fpqa.aod.cols[c])
                     instructions.append(instruction)
-                    # TO-DO: Bookkeeping
+                    if trap_map[literal][0] % 2 == 0:
+                        trap_switches_up.add(tuple((0, c), (trap_map[literal][0], trap_map[literal][1])))
+                    else:
+                        trap_switches_down.add(tuple((0, c), (trap_map[literal][0], trap_map[literal][1])))
+            parallel = Parallel(instructions)
+            shuttle_program.append(parallel)
+            # TO-DO: Actual trap transfer
+            # TO-DO: Reversing traps
+            # TO-DO: Prepare for next execution
                     
                     
