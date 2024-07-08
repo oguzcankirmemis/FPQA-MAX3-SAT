@@ -1,11 +1,15 @@
 from nac.fpqa import FPQA
 from nac.atom import Atom
-from pysat.formula import CNF
+from pysat.formula import 
+from utils.sat_utils import get_color_map
 
 class MAX3SATQAOAMapper:
-    def __init__(self, fpqa: FPQA, formula: CNF, num_colors: int, color_map: list[int]):
+    def __init__(self, fpqa: FPQA, formula: CNF):
+        num_colors, color_map = get_color_map(formula)
         self.fpqa = fpqa
         self.formula = formula
+        self.num_colors = num_colors
+        self.color_map = color_map
         self.color_groups = [set() for i in range(num_colors)]
         self.max_color_group_size = 0
         self.last_unused_atom = len(fpqa.atoms) - 1
@@ -18,7 +22,7 @@ class MAX3SATQAOAMapper:
     def get_atom_map(self) -> list[Atom]:
         if hasattr(self, "atom_map"):
             return self.atom_map
-        atom_map = [None for _ in range(formula.nv)
+        atom_map = [None for _ in range(formula.nv)]
         for color in range(len(self.color_groups)):
             for clause in self.color_groups[color]:
                 literals = list(map(abs, self.formula.clauses[clause]))
@@ -29,6 +33,25 @@ class MAX3SATQAOAMapper:
                     self.last_unused_atom -= 1
         self.atom_map = atom_map
         return atom_map
+
+    def get_clause_map(self) -> list[tuple]:
+        if hasattr(self, "clause_map"):
+            return self.clause_map
+        r = 1
+        c = 0
+        traps = self.fpqa.slm.traps
+        clause_map = [None for _ in range(len(formula.clauses))]
+        for color in range(len(self.color_groups)):
+            for clause in self.color_groups[color]:
+                literals = list(map(abs, self.formula.clauses[clause]))
+                clause_traps = (r, c), (r, c + 1), (r + 1, c)
+                clause_map[clause] = clause_traps
+                c += 3
+            r += 2
+        self.clause_map = clause_map
+        return clause_map
+            
+                    
         
                     
                 
