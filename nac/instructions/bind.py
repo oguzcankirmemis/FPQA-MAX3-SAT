@@ -3,8 +3,9 @@ from nac.fpqa import FPQA
 from nac.atom import Atom
 
 class Bind(Instruction):
-    def __init__(self, fpqa: FPQA, atom: Atom, is_slm: bool, row: int, col: int):
+    def __init__(self, fpqa: FPQA, qid: str, atom: Atom, is_slm: bool, row: int, col: int):
         self.fpqa = fpqa
+        self.qid = qid
         self.atom = atom
         self.is_slm = is_slm
         self.row = row
@@ -37,7 +38,7 @@ class Bind(Instruction):
     def qasm(self) -> str:
         trap_type = "slm" if self.is_slm else "aod"
         index =  self.col * len(self.slm.traps) + self.row if self.is_slm else f"({self.col}, {self.row})"
-        return f"@bind {trap_type} {index}\n"
+        return f"@bind {self.qid} {trap_type} {index}"
 
     def avg_fidelity(self) -> float:
         return 1.0
