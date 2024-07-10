@@ -3,8 +3,11 @@ from pysat.formula import CNF
 import numpy as np
 
 class Max3satHamiltonian:
-    def __init__(self, file):
-        self.formula = CNF(from_file=file)
+    def __init__(self, file = None, formula = None):
+        if formula is not None:
+            self.formula = formula
+        else
+            self.formula = CNF(from_file=file)
         self.single_terms = np.zeros(self.formula.nv)
         self.quadratic_terms = np.zeros((self.formula.nv, self.formula.nv))
         self.cubic_terms = np.zeros((self.formula.nv, self.formula.nv, self.formula.nv))

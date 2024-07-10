@@ -3,7 +3,7 @@ from nac.atom import Atom
 from pysat.formula import 
 from utils.sat_utils import get_color_map
 
-class MAX3SATQAOAMapper:
+class Max3satQaoaMapper:
     def __init__(self, fpqa: FPQA, formula: CNF):
         num_colors, color_map = get_color_map(formula)
         self.fpqa = fpqa
@@ -23,6 +23,7 @@ class MAX3SATQAOAMapper:
         if hasattr(self, "atom_map"):
             return self.atom_map
         atom_map = [None for _ in range(formula.nv)]
+        rev_atom_map = {}
         for color in range(len(self.color_groups)):
             for clause in self.color_groups[color]:
                 literals = list(map(abs, self.formula.clauses[clause]))
@@ -30,9 +31,10 @@ class MAX3SATQAOAMapper:
                     if atom_map[literal] is not None:
                         continue
                     atom_map[literal] = self.fpqa.atoms[self.last_unused_atom]
+                    rev_atom_map[atom_map[literal].id] = literal
                     self.last_unused_atom -= 1
         self.atom_map = atom_map
-        return atom_map
+        return atom_map, rev_atom_map
 
     def get_clause_map(self) -> list[tuple]:
         if hasattr(self, "clause_map"):

@@ -1,7 +1,7 @@
 from pysat.formula import CNF
 from compiler.program import FPQAProgram
-from compiler.color_mapper import MAX3SATQAOAMapper
-from compiler.color_shuttler import MAX3SATQAOAShuttler
+from compiler.color_mapper import Max3satQaoaMapper
+from compiler.color_shuttler import Max3satQaoaShuttler
 from utils.sat_utils import get_color_map
 from nac.fpqa import FPQA
 from nac.aod import AOD
@@ -12,7 +12,7 @@ from nac.instructions.raman import GlobalRaman
 import numpy as np
 
 
-class MAX3SATQAOACompiler:
+class Max3satQaoaCompiler:
     def __init__(self, formula: CNF):
         self.formula = formula
 
@@ -20,9 +20,9 @@ class MAX3SATQAOACompiler:
         program.add_instruction(GlobalRaman(program.fpqa, np.pi / 2.0, 0.0, np.pi))
 
     def _qaoa_mixer(self, program: FPQAProgram, parameter: float)
-        program.add_instruction(GlobalRaman(program.fpqa, np.pi * paramater, 0.0, 0.0))
+        program.add_instruction(GlobalRaman(program.fpqa, parameter, 0.0, 0.0))
 
-    def compile(self) -> FPQAProgram:
+    def compile_single_layer(self) -> FPQAProgram:
         num_colors, color_map = get_color_map(self.formula)
         num_slm_rows = (num_colors + 1) * 2
         num_slm_cols = len(self.formula.clauses) * 3 + self.formula.nv * 2
@@ -34,15 +34,17 @@ class MAX3SATQAOACompiler:
         atoms = [Atom(i + 1, False, 0, i) for i in range(self.formula.nv)]
         fpqa = FPQA(slm, aod, atoms, config)
         program = FPQAProgram(fpqa)
-        mapper = MAX3SATQAOAMapper(fpqa, self.formula)
-        shuttler = MAX3SATQAOAShuttler(fpqa, mapper, self.formula, program)
-        executor = MAX3SATQAOAExecutor(fpqa, self.formula, program)
+        mapper = Max3satQaoaMapper(fpqa, self.formula)
+        shuttler = Max3satQaoaShuttler(fpqa, mapper, self.formula, program)
+        executor = Max3satQaoaExecutor(fpqa, self.formula, program)
         self._qaoa_equal_superposition(self, program)
+        # TO-DO: Randomize parameter
+        parameter = 0.2512 * np.pi
         num_colors, color_map = get_color_map(formula)
         for color in range(num_colors):
             shuttler.shuttle_color(color)
-            executor.execute_color(color)
+            executor.execute_color(color, parameter)
         # TO-DO: Randomize parameter
-        parameter = 0.2512
+        parameter = 0.2512 * np.pi
         self._qaoa_mixer(program, parameter)
         return program

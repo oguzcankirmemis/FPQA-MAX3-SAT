@@ -4,12 +4,12 @@ from nac.instructions.base import Instruction
 from nac.instructions.shuttle import Shuttle
 from nac.instructions.parallel import Parallel
 from nac.instructions.trap_transfer import TrapTransfer
-from compiler.mapper import MAX3SATQAOAMapper
+from compiler.mapper import Max3satQaoaMapper
 from compiler.program import FPQAProgram
 from pysat.formula import CNF
 
-class MAX3SATQAOAShuttler:
-    def __init__(self, fpqa: FPQA, mapper: MAX3SATQAOAMapper, formula: CNF, program: FPQAProgram):
+class Max3satQaoaShuttler:
+    def __init__(self, fpqa: FPQA, mapper: Max3satQaoaMapper, formula: CNF, program: FPQAProgram):
         self.fpqa = fpqa
         self.mapper = mapper
         self.formula = formula
@@ -17,10 +17,7 @@ class MAX3SATQAOAShuttler:
     
     def shuttle_color(self, color: int) -> list[Instruction]:
         shuttle_program = []
-        atom_map = self.mapper.get_atom_map()
-        rev_atom_map = [None for _ in range(len(self.fpqa.atoms))]
-        for atom in range(len(atom_map)):
-            rev_atom_map[atom_map[atom].id] = atom
+        atom_map, rev_atom_map = self.mapper.get_atom_map()
         clause_map = self.mapper.get_clause_map()
         color_map = self.mapper.color_map
         clauses = self.mapper.color_groups[color]
