@@ -8,11 +8,19 @@ from nac.aod import AOD
 from nac.slm.triangular_layout import TriangularLayout
 from nac.config import FPQAConfig
 from nac.atom import Atom
+from nac.instructions.raman import GlobalRaman
+import numpy as np
 
 
 class MAX3SATQAOACompiler:
     def __init__(self, formula: CNF):
         self.formula = formula
+
+    def _qaoa_equal_superposition(self, program: FPQAProgram):
+        program.add_instruction(GlobalRaman(program.fpqa, np.pi / 2.0, 0.0, np.pi))
+
+    def _qaoa_mixer(self, program: FPQAProgram, parameter: float)
+        program.add_instruction(GlobalRaman(program.fpqa, np.pi * paramater, 0.0, 0.0))
 
     def compile(self) -> FPQAProgram:
         num_colors, color_map = get_color_map(self.formula)
@@ -27,5 +35,14 @@ class MAX3SATQAOACompiler:
         fpqa = FPQA(slm, aod, atoms, config)
         program = FPQAProgram(fpqa)
         mapper = MAX3SATQAOAMapper(fpqa, self.formula)
-        shuttler = MAX3SATQAOAShuttler(fpqa, mapper, self.formula)
-        # TO-DO: Execution pipeline
+        shuttler = MAX3SATQAOAShuttler(fpqa, mapper, self.formula, program)
+        executor = MAX3SATQAOAExecutor(fpqa, self.formula, program)
+        self._qaoa_equal_superposition(self, program)
+        num_colors, color_map = get_color_map(formula)
+        for color in range(num_colors):
+            shuttler.shuttle_color(color)
+            executor.execute_color(color)
+        # TO-DO: Randomize parameter
+        parameter = 0.2512
+        self._qaoa_mixer(program, parameter)
+        return program

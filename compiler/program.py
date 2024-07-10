@@ -24,7 +24,6 @@ class FPQAProgram:
         num_qubits = len(self.fpqa.atoms)
         return f"qubit[{num_qubits}] q;\nreset q;\n"
         
-
     def _wqasm_init(self) -> str:
         lines = ["OpenQASM 3.0;\n"]
         num_qubits = len(self.fpqa.atoms)
@@ -32,6 +31,11 @@ class FPQAProgram:
         for i in range(num_qubits):
             lines.append(f"    U(a1, a2, a3) q{i};")
         lines.append("}\n")
+        return "\n".join(line)
+
+    def add_measurement(self):
+        num_qubits = len(self.fpqa.atoms)
+        lines = [f"bit[{num_qubits}] b;", "b = measure q;"]
         return "\n".join(line)
 
     def add_instruction(self, instruction: Instruction):
@@ -54,6 +58,7 @@ class FPQAProgram:
         lines.append(self._qubits_init())
         for instr in exec_instructions:
             lines.append(instr.qasm())
+        lines.append(self.add_measurement())
         lines.append("")
         return "\n".join(lines)
         

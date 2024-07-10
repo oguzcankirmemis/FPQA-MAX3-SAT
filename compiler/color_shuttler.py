@@ -5,13 +5,15 @@ from nac.instructions.shuttle import Shuttle
 from nac.instructions.parallel import Parallel
 from nac.instructions.trap_transfer import TrapTransfer
 from compiler.mapper import MAX3SATQAOAMapper
+from compiler.program import FPQAProgram
 from pysat.formula import CNF
 
 class MAX3SATQAOAShuttler:
-    def __init__(self, fpqa: FPQA, mapper: MAX3SATQAOAMapper, formula: CNF):
+    def __init__(self, fpqa: FPQA, mapper: MAX3SATQAOAMapper, formula: CNF, program: FPQAProgram):
         self.fpqa = fpqa
         self.mapper = mapper
         self.formula = formula
+        self.program = program
     
     def shuttle_color(self, color: int) -> list[Instruction]:
         shuttle_program = []
