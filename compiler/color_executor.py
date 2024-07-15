@@ -2,6 +2,7 @@ from compiler.program import FPQAProgram
 from compiler.color_mapper import Max3satQaoaMapper
 from pysat.formula import CNF
 from nac.fpqa import FPQA
+from nac.atom import Atom
 from utils.hamiltonians import Max3satHamiltonian
 from nac.instructions.raman import GlobalRaman, LocalRaman
 from nac.instructions.rydberg import Rydberg
@@ -10,7 +11,7 @@ from nac.instructions.parallel import Parallel
 from nac.instructions.trap_transfer import TrapTransfer
 
 class Max3satQaoaExecutor:
-    def __init__(self, fpqa: FPQA, formula: CNF, mapper: Max3satQaoaMapper, program: FPQAProgram):
+    def __init__(self, fpqa: FPQA, mapper: Max3satQaoaMapper, formula: CNF,  program: FPQAProgram):
         self.fpqa = fpqa
         self.formula = formula
         self.mapper = mapper
@@ -70,10 +71,10 @@ class Max3satQaoaExecutor:
 
     def _get_cnot_angle_signs(self, aod_pairs: list[tuple[Atom, Atom]], clauses: list[list[int]]) -> list[float]:
         atom_map, rev_atom_map = self.mapper.get_atom.map()
-        angle_signs = [1.0 for _ in clauses]:
+        angle_signs = [1.0 for _ in clauses]
         for i, clause in enumerate(clauses):
             literal_sign = {abs(l): 1 if l > 0 else -1 for l in clause}
-            angle_signs[i] = literal_sign[rev_atom_map[aod_pairs[i][0].id]] * literal_sign[rev_atom_map[aod_pairs[i][1].id]] == -1:
+            angle_signs[i] = literal_sign[rev_atom_map[aod_pairs[i][0].id]] * literal_sign[rev_atom_map[aod_pairs[i][1].id]]
         return angle_signs
     
     def _implement_ccnot_control(self, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]]):
@@ -154,7 +155,7 @@ class Max3satQaoaExecutor:
         offset = self.fpqa.slm.traps[slm_atoms[0].row][slm_atoms[0].col].y - self.fpqa.aod.rows[0]
         self.program.add_instruction(Shuttle(self.fpqa, True, 0, offset))
         instructions = []
-        slm_atoms.sort(key: lambda atom: atom.col)
+        slm_atoms.sort(key=lambda atom: atom.col)
         aod_col = len(self.fpqa.aod.cols) - 2
         for atom in reversed(slm_atoms):
             instructions.append(TrapTransfer(self.fpqa, atom.row, atom.col, 0, aod_col))

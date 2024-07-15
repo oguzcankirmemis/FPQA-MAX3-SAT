@@ -13,8 +13,8 @@ class AODInit(Instruction):
         return True
 
     def qasm(self) -> str:
-        rows = f"[{", ".join(self.fpqa.aod.rows)}]"
-        cols = f"[{", ".join(self.fpqa.aod.cols)}]"
+        rows = f"[{', '.join(self.fpqa.aod.rows)}]"
+        cols = f"[{', '.join(self.fpqa.aod.cols)}]"
         return f"@aod {cols} {rows}"
 
     def avg_fidelity(self) -> float:

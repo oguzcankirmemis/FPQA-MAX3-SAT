@@ -13,14 +13,17 @@ def uniformly_random_independent_clauses(num_clauses: int, start_literal_id: int
         literal += 3
     return clauses
 
-def get_graph(formula: CNF) -> tuple[list[int], list[list[bool]]]
+def get_graph(formula: CNF) -> tuple[list[int], list[list[bool]]]:
     N = len(formula.clauses)
     V = [i for i in range(N)]
     E = [[False] * N for _ in range(N)]
     for u in range(N):
         for v in range(u + 1, N):
-            E[u][v] = True
-            E[v][u] = True 
+            literal_set1 = set(map(abs, formula.clauses[u]))
+            literal_set2 = set(map(abs, formula.clauses[v]))
+            if len(literal_set1 & literal_set2) > 0:
+                E[u][v] = True
+                E[v][u] = True 
     return V, E
 
 def get_color_map(formula: CNF) -> list[int]:
@@ -31,25 +34,26 @@ def get_color_map(formula: CNF) -> list[int]:
     uncolored = set(i for i in range(1, len(formula.clauses)))
     num_colors = 1
     while len(uncolored) > 0:
-        choosen, curr_saturation = -1, 0 
+        chosen, curr_saturation = -1, -1
         for clause in uncolored:
             saturation = 0
             for colored_clause in colored:
                 if E[clause][colored_clause]:
                     saturation += 1
             if saturation > curr_saturation:
-                choosen = clause
+                chosen = clause
                 curr_saturation = saturation
-            used_colors = filter(lambda v: color_map[v] is not None, E[choosen])
+            colored_neighbors = filter(lambda v: E[chosen][v] and color_map[v] is not None, range(len(E[chosen])))
+            used_colors = list(map(lambda v: color_map[v], colored_neighbors))
             used_colors.sort()
-            color_map[choosen] = used_colors[-1] + 1
+            color_map[chosen] = used_colors[-1] + 1 if len(used_colors) > 0 else 0
             prev_used_color = -1
             for curr_used_color in used_colors:
                 if curr_used_color - prev_used_color > 1:
-                    color_map[choosen] = prev_used_color + 1
+                    color_map[chosen] = prev_used_color + 1
                     break
                 prev_used_color = curr_used_color
-            colored.add(choosen)
-            uncolored.remove(chosen)
-            num_colors = max(num_colors, color_map[chosen] + 1)
+        colored.add(chosen)
+        uncolored.remove(chosen)
+        num_colors = max(num_colors, color_map[chosen] + 1)
     return num_colors, color_map

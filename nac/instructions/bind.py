@@ -29,11 +29,11 @@ class Bind(Instruction):
         return self._verify_aod()
 
     def _verify_aod(self) -> bool:
-        return self.row >= 0 and self.row < len(self.fpqa.aod.rows) and self.col >= 0 and self.col < len(self.fpqa.aod.cols)
+        return (self.row >= 0 and self.row < len(self.fpqa.aod.rows) and 
+            self.col >= 0 and self.col < len(self.fpqa.aod.cols))
 
     def _verify_slm(self) -> bool:
-        return self.row >= 0 and self.row < len(self.fpqa.slm.traps) and 
-            self.col >= 0 and self.col < len(self.fpqa.slm.traps[self.row]) 
+        return self.row >= 0 and self.row < len(self.fpqa.slm.traps) and self.col >= 0 and self.col < len(self.fpqa.slm.traps[self.row]) 
 
     def qasm(self) -> str:
         trap_type = "slm" if self.is_slm else "aod"

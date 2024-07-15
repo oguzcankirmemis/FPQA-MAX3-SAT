@@ -18,7 +18,7 @@ class FPQAProgram:
     def _bind_init(self):
         for i in len(self.fpqa.atoms):
             atom = self.fpqa.atoms[i]
-            self.instructions.append(Bind(self.fpqa, f"q[{i}]", atom, atom.is_slm, atom.row, atom.col)
+            self.instructions.append(Bind(self.fpqa, f"q[{i}]", atom, atom.is_slm, atom.row, atom.col))
 
     def _qubits_init(self) -> str:
         num_qubits = len(self.fpqa.atoms)
@@ -27,7 +27,8 @@ class FPQAProgram:
     def _wqasm_init(self) -> str:
         lines = ["OpenQASM 3.0;\n"]
         num_qubits = len(self.fpqa.atoms)
-        lines.append(f"gate u3_global(a1, a2, a3) {", ".join([f"q{i}" for i in range(num_qubits)])} \{")
+        qubit_args = ", ".join([f"q{i}" for i in range(num_qubits)])
+        lines.append(f"gate u3_global(a1, a2, a3) {qubit_args} {{")
         for i in range(num_qubits):
             lines.append(f"    U(a1, a2, a3) q{i};")
         lines.append("}\n")

@@ -5,7 +5,7 @@ class Atom:
         self.row = row
         self.col = col
 
-    def assign_trap(is_slm: bool, row: int, col: int):
+    def assign_trap(self, is_slm: bool, row: int, col: int):
         self.is_slm = is_slm
         self.row = row
         self.col = col

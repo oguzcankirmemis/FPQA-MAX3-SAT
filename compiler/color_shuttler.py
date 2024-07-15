@@ -4,7 +4,7 @@ from nac.instructions.base import Instruction
 from nac.instructions.shuttle import Shuttle
 from nac.instructions.parallel import Parallel
 from nac.instructions.trap_transfer import TrapTransfer
-from compiler.mapper import Max3satQaoaMapper
+from compiler.color_mapper import Max3satQaoaMapper
 from compiler.program import FPQAProgram
 from pysat.formula import CNF
 
@@ -49,7 +49,7 @@ class Max3satQaoaShuttler:
                 atom = self.fpqa.aod.get_atom_at_trap(c, 0)
                 if atom is None or color_map[rev_atom_map[atom.id]] != color:
                     last_x -= self.fpqa.config["AOD_BEAM_PROXIMITY"]
-                    instruction = Shuttle(self.fpqa, False, last_x - self.fpqa.aod.cols[c]
+                    instruction = Shuttle(self.fpqa, False, last_x - self.fpqa.aod.cols[c])
                     instructions.append(instruction)
                 else:
                     literal = rev_atom_map[atom.id]

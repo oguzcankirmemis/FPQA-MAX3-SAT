@@ -17,7 +17,7 @@ class LocalRaman(Instruction):
     def verify(self) -> bool:
         count = 0
         for atom in self.fpqa.atoms:
-            if atom == self.atom
+            if atom == self.atom:
                 count += 1
         return count == 1
 
@@ -38,7 +38,6 @@ class GlobalRaman(Instruction):
         self.x_angle = x_angle
         self.y_angle = y_angle
         self.z_angle = z_angle
-        self.gate_name = f"global_raman_{_global_raman_gate_id}"
     
     def apply(self):
         if not self.verify():
@@ -48,8 +47,9 @@ class GlobalRaman(Instruction):
         return True
 
     def qasm(self) -> str:
+        qubit_args = ", ".join([f"q[{atom.id}]" for atom in self.fpqa.atoms])
         lines = [f"@raman global ({self.x_angle}, {self.y_angle}, {self.z_angle})",
-                 f"u3_global({self.x_angle}, {self.y_angle}, {self.z_angle}) {", ".join([f"q[{atom.id}]" for atom in self.fpqa.atoms])};\n"]
+                 f"u3_global({self.x_angle}, {self.y_angle}, {self.z_angle}) {qubit_args};\n"]
         return "\n".join(lines)
 
     def avg_fidelity(self) -> float:

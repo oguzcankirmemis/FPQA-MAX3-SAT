@@ -13,7 +13,7 @@ defaults = {
     "TRAP_SWAP_DURATION": 20,
     "TRAP_SWAP_FIDELITY": 1.0,
     "INTERACTION_RADIUS": 2.0, # in micrometers
-    "RESTRICTION_RADIUS": 4.0 # in micrometers
+    "RESTRICTION_RADIUS": 4.0, # in micrometers
     "TRAP_TRANSFER_PROXIMITY": 1e-05, # in micrometers
     "AOD_BEAM_RPOXIMITY": 1e-03 # in micrometers
 }
