@@ -21,19 +21,20 @@ class Max3satQaoaMapper:
 
     def get_atom_map(self) -> list[Atom]:
         if hasattr(self, "atom_map"):
-            return self.atom_map
+            return self.atom_map, self.rev_atom_map
         atom_map = [None for _ in range(self.formula.nv)]
         rev_atom_map = {}
         for color in range(len(self.color_groups)):
             for clause in self.color_groups[color]:
                 literals = list(map(abs, self.formula.clauses[clause]))
                 for literal in literals:
-                    if atom_map[literal] is not None:
+                    if atom_map[literal - 1] is not None:
                         continue
-                    atom_map[literal] = self.fpqa.atoms[self.last_unused_atom]
-                    rev_atom_map[atom_map[literal].id] = literal
+                    atom_map[literal - 1] = self.fpqa.atoms[self.last_unused_atom]
+                    rev_atom_map[atom_map[literal - 1].id] = literal
                     self.last_unused_atom -= 1
         self.atom_map = atom_map
+        self.rev_atom_map = rev_atom_map
         return atom_map, rev_atom_map
 
     def get_clause_map(self) -> list[tuple]:
@@ -42,7 +43,7 @@ class Max3satQaoaMapper:
         r = 1
         c = 0
         traps = self.fpqa.slm.traps
-        clause_map = [None for _ in range(len(formula.clauses))]
+        clause_map = [None for _ in range(len(self.formula.clauses))]
         for color in range(len(self.color_groups)):
             for clause in self.color_groups[color]:
                 literals = list(map(abs, self.formula.clauses[clause]))

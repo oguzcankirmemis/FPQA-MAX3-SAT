@@ -22,14 +22,17 @@ class Max3satQaoaShuttler:
         color_map = self.mapper.color_map
         clauses = self.mapper.color_groups[color]
         sorted_clauses = list(clauses)
-        sorted_clauses.sort(key = lambda clause: self.fpqa.slm.traps[clause_map[clause][0][0]][clause_map[clause][0][1]])
+        print(clause_map)
+        sorted_clauses.sort(key = lambda clause: self.fpqa.slm.traps[clause_map[clause][0][0]][clause_map[clause][0][1]].x)
         trap_map = {}
         for clause in clauses:
             traps = clause_map[clause]
             literals = list(map(abs, self.formula.clauses[clause]))
             for i in range(len(literals)):
                 trap_map[literals[i]] = traps[i]
-        last_clause = clause_map[sorted_clauses[-1]][1]
+        print(sorted_clauses)
+        last_clause = clause_map[sorted_clauses[-1]]
+        print(last_clause)
         last_trap = self.fpqa.slm.traps[last_clause[1][0]][last_clause[1][0]]
         prev_trap = self.fpqa.slm.traps[last_clause[0][0]][last_clause[0][1]]
         prev_y = self.fpqa.aod.rows[0]
@@ -48,8 +51,8 @@ class Max3satQaoaShuttler:
             for c in range(len(self.fpqa.aod.cols)):
                 atom = self.fpqa.aod.get_atom_at_trap(c, 0)
                 if atom is None or color_map[rev_atom_map[atom.id]] != color:
-                    last_x -= self.fpqa.config["AOD_BEAM_PROXIMITY"]
-                    instruction = Shuttle(self.fpqa, False, last_x - self.fpqa.aod.cols[c])
+                    last_x -= self.fpqa.config.AOD_BEAM_PROXIMITY
+                    instruction = Shuttle(self.fpqa, False, c, last_x - self.fpqa.aod.cols[c])
                     instructions.append(instruction)
                 else:
                     literal = rev_atom_map[atom.id]
@@ -58,9 +61,10 @@ class Max3satQaoaShuttler:
                     instruction = Shuttle(self.fpqa, False, c, trap.x - self.fpqa.aod.cols[c])
                     instructions.append(instruction)
                     if trap_map[literal][0] % 2 == 0:
-                        trap_switches_up.add(tuple((0, c), (trap_map[literal][0], trap_map[literal][1])))
+                        trap_switches_up.add(((0, c), (trap_map[literal][0], trap_map[literal][1])))
                     else:
-                        trap_switches_down.add(tuple((0, c), (trap_map[literal][0], trap_map[literal][1])))
+                        trap_switches_down.add(((0, c), (trap_map[literal][0], trap_map[literal][1])))
+                    num_shuttle -= 1
             parallel = Parallel(instructions)
             shuttle_program.append(parallel)
             if len(trap_switches_up) > 0:
@@ -84,7 +88,9 @@ class Max3satQaoaShuttler:
                 shuttle_program.append(parallel)
             instruction = Shuttle(self.fpqa, True, 0, prev_y - self.fpqa.aod.rows[0])
             shuttle_program.append(instruction)
-        first_clause = clause_map[sorted_clauses[0]][0]
+        first_clause = clause_map[sorted_clauses[0]]
+        print(first_clause)
+        first_trap = self.fpqa.slm.traps[first_clause[0][0]][first_clause[0][1]]
         instruction = Shuttle(self.fpqa, True, 0, first_trap.y - self.fpqa.aod.rows[0])
         shuttle_program.append(instruction)
         last_trap_r, last_trap_c = first_clause[0][0], first_clause[0][1]
@@ -93,7 +99,7 @@ class Max3satQaoaShuttler:
         trap_switches = set()
         instructions = []
         for c in reversed(range(len(self.fpqa.aod.cols))):
-            atom = self.fpqa.aod.get_atom.at_trap(c, 0)
+            atom = self.fpqa.aod.get_atom_at_trap(c, 0)
             if atom is None:
                 last_x -= self.fpqa.config["AOD_BEAM_PROXIMITY"]
                 instruction = Shuttle(self.fpqa, False, c, last_x - self.fpqa.aod.cols[c])
@@ -104,7 +110,7 @@ class Max3satQaoaShuttler:
                 last_x = last_trap.x
                 instruction = Shuttle(self.fpqa, False, c, last_x - self.fpqa.aod.cols[c])
                 instructions.append(instruction)
-                trap_switches.add(tuple((0, c), (last_trap_r, last_trap_c)))
+                trap_switches.add(((0, c), (last_trap_r, last_trap_c)))
         parallel = Parallel(instructions)
         shuttle_program.append(parallel)
         instructions = []
@@ -121,7 +127,7 @@ class Max3satQaoaShuttler:
             instruction = Shuttle(self.fpqa, False, c, self.fpqa.slm.traps[atoms[c].row][atoms[c].col].x - self.fpqa.aod.cols[c])
             instructions.append(instruction)
             if abs(self.fpqa.slm.traps[atoms[c].row][atoms[c].col].y - self.fpqa.aod.rows[0]) < 1e-09:
-                trap_switches.add((0, c), (atoms[c].row, atoms[c].col))
+                trap_switches.add(((0, c), (atoms[c].row, atoms[c].col)))
         parallel = Parallel(instructions)
         shuttle_program.append(parallel)
         instructions = []

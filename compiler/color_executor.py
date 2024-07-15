@@ -125,10 +125,10 @@ class Max3satQaoaExecutor:
             literals = map(abs, self.formula.clauses[clause])
             aod_pair = []
             for literal in literals:
-                if atom_map[literal].is_slm:
-                    slm_atoms.append(atom_map[literal])
+                if atom_map[literal - 1].is_slm:
+                    slm_atoms.append(atom_map[literal - 1])
                 else:
-                    aod_pair.append(atom_map[literal])
+                    aod_pair.append(atom_map[literal - 1])
                 aod_atoms.append(tuple(aod_pair))
         ccnot_angle_signs = self._get_ccnot_angle_signs(aod_atoms, slm_atoms, clauses)
         cnot_angle_signs = self._get_cnot_angle_signs(aod_atoms, clauses)
