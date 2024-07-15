@@ -46,11 +46,12 @@ class Max3satQaoaExecutor:
         return angle_signs 
     
     def _get_ccnot_angle_signs(self, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]]) -> list[float]:
+        print(slm_atoms, aod_pairs)
         atom_map, rev_atom_map = self.mapper.get_atom_map()
         angle_signs = [1.0 for _ in clauses]
         for i, clause in enumerate(clauses):
-            literal_sign = {abs(l): 1 if l > 0 else -1 for l in clause}
-            pos_count = sum(map(lambda l: 1 if l > 0 else 0, clause))
+            literal_sign = {abs(l): 1 if l > 0 else -1 for l in self.formula.clauses[clause]}
+            pos_count = sum(map(lambda l: 1 if l > 0 else 0, self.formula.clauses[clause]))
             if pos_count == 3:
                 angle_signs[i] = -1.0
             elif pos_count == 2 and literal_sign[rev_atom_map[slm_atoms[i].id]] == -1:
