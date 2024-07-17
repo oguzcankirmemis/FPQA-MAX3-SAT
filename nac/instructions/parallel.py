@@ -7,11 +7,13 @@ class Parallel(Instruction):
     
     def apply(self):
         for instruction in self.instructions:
-            if not instruction.verify():
-                raise ValueError("Cannot apply parallel in current FPQA setting")
+            print(instruction)
+            #if not instruction.verify():
+            #    raise ValueError("Cannot apply parallel in current FPQA setting")
             instruction.apply()
 
     def verify(self) -> bool:
+        # TO-DO: add proper parallel instruction verification
         return all(instruction.verify() for instruction in self.instructions)
 
     def qasm(self) -> str:

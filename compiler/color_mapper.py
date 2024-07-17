@@ -2,6 +2,7 @@ from nac.fpqa import FPQA
 from nac.atom import Atom
 from pysat.formula import CNF
 from utils.sat_utils import get_color_map
+from math import ceil
 
 class Max3satQaoaMapper:
     def __init__(self, fpqa: FPQA, formula: CNF):
@@ -41,7 +42,7 @@ class Max3satQaoaMapper:
         if hasattr(self, "clause_map"):
             return self.clause_map
         r = 1
-        c = 0
+        c = ceil(2.0 * self.formula.nv / 3.0) + 1
         traps = self.fpqa.slm.traps
         clause_map = [None for _ in range(len(self.formula.clauses))]
         for color in range(len(self.color_groups)):

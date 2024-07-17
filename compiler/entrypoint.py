@@ -30,7 +30,7 @@ class Max3satQaoaCompiler:
         num_aod_rows = 1
         num_aod_cols = self.formula.nv
         config = FPQAConfig({})
-        aod = AOD(config.INTERACTION_RADIUS, num_aod_rows, num_aod_cols)
+        aod = AOD(config.INTERACTION_RADIUS / 2.0, num_aod_rows, num_aod_cols)
         slm = TriangularLayout(config.INTERACTION_RADIUS, num_slm_rows, num_slm_cols)
         atoms = [Atom(i + 1, False, 0, i) for i in range(self.formula.nv)]
         fpqa = FPQA(slm, aod, atoms, config)
