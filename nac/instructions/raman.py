@@ -4,7 +4,7 @@ from nac.atom import Atom
 
 class LocalRaman(Instruction):
     def __init__(self, fpqa: FPQA, atom: Atom, x_angle: float, y_angle: float, z_angle: float):
-        self.fpqa = fqpa
+        self.fpqa = fpqa
         self.atom = atom
         self.x_angle = x_angle
         self.y_angle = y_angle
@@ -27,10 +27,10 @@ class LocalRaman(Instruction):
         return "\n".join(lines)
 
     def avg_fidelity(self) -> float:
-        return self.fpqa.config["U3_GATE_FIDELITY"]
+        return self.fpqa.config.U3_GATE_FIDELITY
 
     def duration(self) -> float:
-        return self.fpqa.config["U3_GATE_DURATION"]
+        return self.fpqa.config.U3_GATE_DURATION
 
 class GlobalRaman(Instruction):
     def __init__(self, fpqa: FPQA, x_angle: float, y_angle: float, z_angle: float):
@@ -53,7 +53,7 @@ class GlobalRaman(Instruction):
         return "\n".join(lines)
 
     def avg_fidelity(self) -> float:
-        return self.fpqa.config["U3_GATE_FIDELITY"] ** len(self.fpqa.atoms)
+        return self.fpqa.config.U3_GATE_FIDELITY ** len(self.fpqa.atoms)
 
     def duration(self) -> float:
-        return self.fpqa.config["U3_GATE_DURATION"]
+        return self.fpqa.config.U3_GATE_DURATION

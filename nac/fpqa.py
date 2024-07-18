@@ -26,17 +26,17 @@ class FPQA:
     def is_interacting(self, atom1: Atom, atom2: Atom) -> bool:
         pos1 = 0.0, 0.0
         if atom1.is_slm:
-            pos1 = self.slm.position(self.atom.col, self.atom.row)
+            pos1 = self.slm.position(atom1.col, atom1.row)
         else:
-            pos1 = self.aod.position(self.atom.col, self.atom.row)
+            pos1 = self.aod.position(atom1.col, atom1.row)
         pos2 = 0.0, 0.0
         if atom2.is_slm:
-            pos2 = self.slm.position(self.atom.col, self.atom.row)
+            pos2 = self.slm.position(atom2.col, atom2.row)
         else:
-            pos2 = self.aod.position(self.atom.col, self.atom.row)
+            pos2 = self.aod.position(atom2.col, atom2.row)
         dx = pos1[0] - pos2[0]
         dy = pos1[1] - pos2[1]
         distance = sqrt(dx * dx + dy * dy)
-        return distance <= self.config["INTERACTION_RADIUS"]
+        return distance <= self.config.INTERACTION_RADIUS
         
             

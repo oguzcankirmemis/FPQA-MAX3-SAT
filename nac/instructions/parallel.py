@@ -7,7 +7,6 @@ class Parallel(Instruction):
     
     def apply(self):
         for instruction in self.instructions:
-            print(instruction)
             #if not instruction.verify():
             #    raise ValueError("Cannot apply parallel in current FPQA setting")
             instruction.apply()
@@ -23,11 +22,11 @@ class Parallel(Instruction):
     def avg_fidelity(self) -> float:
         fidelity = 1.0
         for instruction in self.instructions:
-            fidelity *= instruction.avg_fidelity
+            fidelity *= instruction.avg_fidelity()
         return fidelity
     
-    def duration() -> float:
+    def duration(self) -> float:
         duration = 0.0
         for instruction in self.instructions:
-            duration = max(duration, instruction)
+            duration = max(duration, instruction.duration())
         return duration

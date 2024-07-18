@@ -19,18 +19,14 @@ class TrapTransfer(Instruction):
 
     def verify(self) -> bool:
         if self.fpqa.slm.occupied(self.slm_col, self.slm_row) and self.fpqa.aod.occupied(self.aod_col, self.aod_row):
-            print("transferlog1")
             return False
         if not self.fpqa.slm.occupied(self.slm_col, self.slm_row) and not self.fpqa.aod.occupied(self.aod_col, self.aod_row):
-            print("transferlog2")
             return False
         slm_pos_x, slm_pos_y = self.fpqa.slm.position(self.slm_col, self.slm_row)
         aod_pos_x, aod_pos_y = self.fpqa.aod.position(self.aod_col, self.aod_row)
         dx, dy = slm_pos_x - aod_pos_x, slm_pos_y - aod_pos_y
         distance = dx * dx + dy * dy
-        print(dx, dy)
         if distance > self.fpqa.config.TRAP_TRANSFER_PROXIMITY:
-            print("transferlog3")
             return False
         return True
 

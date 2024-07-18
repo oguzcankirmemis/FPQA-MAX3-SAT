@@ -36,27 +36,16 @@ class Shuttle(Instruction):
         return True
 
     def _verify_column(self) -> bool:
-        print(self.index)
-        print(self.fpqa.aod.cols[self.index - 1])
-        print(self.fpqa.aod.cols[self.index])
-        if self.index < len(self.fpqa.aod.cols) - 1:
-            print(self.fpqa.aod.cols[self.index + 1])
-        print(self.offset)
         next_pos = self.fpqa.aod.cols[self.index] + self.offset
-        print(next_pos)
         if self.index > 0:
             if self.fpqa.aod.cols[self.index - 1] > next_pos:
-                print("shuttlelog1")
                 return False
             if abs(self.fpqa.aod.cols[self.index - 1] - next_pos) < self.fpqa.config.AOD_BEAM_PROXIMITY:
-                print("shuttlelog2")
                 return False
         if self.index < len(self.fpqa.aod.cols) - 1:
             if self.fpqa.aod.cols[self.index + 1] < next_pos:
-                print("shuttlelog3")
                 return False
             if abs(self.fpqa.aod.cols[self.index + 1] - next_pos) < self.fpqa.config.AOD_BEAM_PROXIMITY:
-                print("shuttlelog4")
                 return False
         return True
 
@@ -64,8 +53,8 @@ class Shuttle(Instruction):
         array_type = "row" if self.is_row else "col"
         return f"@shuttle {array_type} {self.index} {self.offset}\n"
 
-    def avg_fidelity() -> float:
+    def avg_fidelity(self) -> float:
         return self.fpqa.config.SHUTTLING_FIDELITY
 
-    def duration() -> float:
+    def duration(self) -> float:
         return self.offset / self.fpqa.config.SHUTTLING_SPEED
