@@ -20,7 +20,7 @@ class Max3satQaoaExecutor:
         self.hamiltonian = Max3satHamiltonian(formula=formula)
         # TO-DO: Optimize fidelity in single/quadratic terms
         self.implemented_quadratic_terms = {}
-        self.single_term_corrections = {}
+        self.linear_terms = {atom.id: 0.0 for atom in self.fpqa.atoms}
 
     def _get_slm_qubit_errors(self, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]]) -> list[float]:
         atom_map, rev_atom_map = self.mapper.get_atom_map()
@@ -102,20 +102,28 @@ class Max3satQaoaExecutor:
                 self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][0], np.pi, 0.0, 0.0))
                 self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][1], np.pi, 0.0, 0.0))
 
-    def _implement_single_qubit_terms(self, parameter: float, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]]):
+    def _add_single_qubit_terms(self, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]]):
         atom_map, rev_atom_map = self.mapper.get_atom_map()
         slm_qubit_errors = self._get_slm_qubit_errors(aod_pairs, slm_atoms, clauses)
         for i, clause in enumerate(clauses):
             literal_sign = {abs(l): 1 if l > 0 else -1 for l in self.formula.clauses[clause]}
-            term = -literal_sign[rev_atom_map[slm_atoms[i].id]]
-            if term != slm_qubit_errors[i]:
-                factor = term - slm_qubit_errors[i]
-                self.program.add_instruction(LocalRaman(self.fpqa, slm_atoms[i], term * 2.0 * parameter, 0.0, 0.0))  
-            term = -literal_sign[rev_atom_map[aod_pairs[i][0].id]]
-            self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][0], term * 2.0 * parameter, 0.0, 0.0))
-            term = -literal_sign[rev_atom_map[aod_pairs[i][1].id]]
-            self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][1], term * 2.0 * parameter, 0.0, 0.0))
-                  
+            slm_term = -literal_sign[rev_atom_map[slm_atoms[i].id]]
+            if slm_term != slm_qubit_errors[i]:
+                self.linear_terms[slm_atoms[i].id] += slm_term - slm_qubit_errors[i]
+                #factor = term - slm_qubit_errors[i]
+                #self.program.add_instruction(LocalRaman(self.fpqa, slm_atoms[i], factor * 2.0 * parameter, 0.0, 0.0))  
+            self.linear_terms[aod_pairs[i][0].id] += -literal_sign[rev_atom_map[aod_pairs[i][0].id]]
+            self.linear_terms[aod_pairs[i][1].id] += -literal_sign[rev_atom_map[aod_pairs[i][1].id]]
+            #term = -literal_sign[rev_atom_map[aod_pairs[i][0].id]]
+            #self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][0], term * 2.0 * parameter, 0.0, 0.0))
+            #term = -literal_sign[rev_atom_map[aod_pairs[i][1].id]]
+            #self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][1], term * 2.0 * parameter, 0.0, 0.0))
+
+    def implement_single_qubit_terms(self, parameter: float):
+        for atom in self.fpqa.atoms:
+            self.program.add_instruction(LocalRaman(self.fpqa, atom, 0.0, 0.0, 2.0 * self.linear_terms[atom.id] * parameter))
+            
+    
     def execute_color(self, color: int, parameter: float):
         atom_map, rev_atom_map = self.mapper.get_atom_map()
         color_groups = self.mapper.color_groups
@@ -152,7 +160,7 @@ class Max3satQaoaExecutor:
         self.program.add_instruction(Rydberg(self.fpqa))
         for atom1, atom2 in aod_atoms:
             self.program.add_instruction(LocalRaman(self.fpqa, atom2, np.pi / 2.0, 0.0, np.pi))
-        self._implement_single_qubit_terms(parameter, aod_atoms, slm_atoms, clauses)
+        self._add_single_qubit_terms(aod_atoms, slm_atoms, clauses)
         offset = self.fpqa.slm.traps[slm_atoms[0].row][slm_atoms[0].col].y - self.fpqa.aod.rows[0]
         self.program.add_instruction(Shuttle(self.fpqa, True, 0, offset))
         instructions = []

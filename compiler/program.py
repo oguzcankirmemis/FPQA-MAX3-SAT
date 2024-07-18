@@ -42,6 +42,18 @@ class FPQAProgram:
     def add_instruction(self, instruction: Instruction):
         instruction.apply()
         self.instructions.append(instruction)
+
+    def avg_fidelity(self):
+        fidelity = 1.0
+        for instruction in self.instructions:
+            fidelity *= instruction.avg_fidelity()
+        return fidelity
+
+    def duration(self):
+        duration = 0
+        for instruction in self.instructions:
+            duration += instruction.duration()
+        return duration
         
     def write(self):
         pass

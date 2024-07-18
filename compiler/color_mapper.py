@@ -48,7 +48,7 @@ class Max3satQaoaMapper:
         for color in range(len(self.color_groups)):
             for clause in self.color_groups[color]:
                 literals = list(map(abs, self.formula.clauses[clause]))
-                clause_traps = (r, c), (r, c + 1), (r + 1, c)
+                clause_traps = (r, c), (r, c + 1), (r + 1, c + 1)
                 clause_map[clause] = clause_traps
                 c += 3
             r += 2

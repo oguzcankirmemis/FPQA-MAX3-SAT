@@ -21,16 +21,11 @@ class Max3satQaoaShuttler:
         color_map = self.mapper.color_map
         clauses = self.mapper.color_groups[color]
         sorted_clauses = list(clauses)
-        print(sorted_clauses)
-        print(color_map)
-        print(rev_atom_map)
-        print(atom_map)
         sorted_clauses.sort(key = lambda clause: self.fpqa.slm.traps[clause_map[clause][0][0]][clause_map[clause][0][1]].x)
         participating_atoms = set()
         for clause in sorted_clauses:
             for literal in self.formula.clauses[clause]:
                 participating_atoms.add(atom_map[abs(literal) - 1].id)
-        print(participating_atoms)
         trap_map = {}
         for clause in clauses:
             traps = clause_map[clause]
@@ -41,9 +36,6 @@ class Max3satQaoaShuttler:
         last_trap = self.fpqa.slm.traps[last_clause[1][0]][last_clause[1][1]]
         prev_trap = self.fpqa.slm.traps[last_clause[0][0]][last_clause[0][1]]
         prev_y = self.fpqa.aod.rows[0]
-        print(last_clause)
-        print(last_trap.x, last_trap.y)
-        print(prev_trap.x, prev_trap.y)
         shuttle_map = {}
         num_shuttle = 0
         for clause in clauses:
@@ -53,7 +45,6 @@ class Max3satQaoaShuttler:
             num_shuttle += 3
         while num_shuttle > 0:
             last_x = 2 * last_trap.x - prev_trap.x
-            print(last_x)
             trap_switches_up = set()
             trap_switches_down = set()
             instructions = []
@@ -82,11 +73,7 @@ class Max3satQaoaShuttler:
             if len(trap_switches_up) == 0 and len(trap_switches_down) == 0:
                 raise ValueError("Something wrong occurred in shuttler!")
             parallel = Parallel(instructions)
-            for c in range(len(self.fpqa.aod.cols)):
-                print(c, self.fpqa.aod.cols[c])
             self.program.add_instruction(parallel)
-            print(trap_switches_down)
-            print(trap_switches_up)
             if len(trap_switches_up) > 0:
                 instruction = Shuttle(self.fpqa, True, 0, last_trap.y - self.fpqa.aod.rows[0])
                 self.program.add_instruction(instruction)
@@ -150,9 +137,9 @@ class Max3satQaoaShuttler:
         parallel = Parallel(instructions)
         self.program.add_instruction(parallel)
         instructions = []
-        for (aod_r, aod_col), (slm_r, slm_c) in trap_switches:
+        for (aod_r, aod_c), (slm_r, slm_c) in trap_switches:
             transfer = TrapTransfer(self.fpqa, slm_r, slm_c, aod_r, aod_c)
-            instructions.append(parallel)
+            instructions.append(transfer)    
         parallel = Parallel(instructions)
         self.program.add_instruction(parallel)
                 
