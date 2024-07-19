@@ -19,8 +19,14 @@ class Max3satQaoaExecutor:
         self.program = program
         self.hamiltonian = Max3satHamiltonian(formula=formula)
         # TO-DO: Optimize fidelity in single/quadratic terms
-        self.implemented_quadratic_terms = {}
-        self.linear_terms = {atom.id: 0.0 for atom in self.fpqa.atoms}
+        self.quadratic_terms = {}
+        for i in range(len(self.fpqa.atoms)):
+            for j in range(i + 1, len(self.fpqa.atoms)):
+                atom1, atom2 = self.fpqa.atoms[i], self.fpqa.atoms[j]
+                if atom2.id < atom1.id:
+                    atom2, atom1 = atom1, atom2
+                self.quadratic_terms[(atom1.id, atom2.id)] = 0.0
+        self.linear_terms = {atom.id: 0.0 for atom in fpqa.atoms}
 
     def _get_slm_qubit_errors(self, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]]) -> list[float]:
         atom_map, rev_atom_map = self.mapper.get_atom_map()
@@ -70,6 +76,15 @@ class Max3satQaoaExecutor:
                 pass
         return angle_signs
 
+    def _add_quadratic_terms(self, aod_pairs: list[tuple[Atom, Atom]], clauses: list[list[int]]):
+        atom_map, rev_atom_map = self.mapper.get_atom_map()
+        for i, clause in enumerate(clauses):
+            atom1, atom2 = aod_pairs[i][0], aod_pairs[i][1]
+            if atom2.id < atom1.id:
+                atom2, atom1 = atom1, atom2
+            literal_sign = {abs(l): 1 if l > 0 else -1 for l in self.formula.clauses[clause]}
+            self.quadratic_terms[(atom1.id, atom2.id)] += literal_sign[rev_atom_map[atom1.id]] * literal_sign[rev_atom_map[atom2.id]]
+
     def _get_cnot_angle_signs(self, aod_pairs: list[tuple[Atom, Atom]], clauses: list[list[int]]) -> list[float]:
         atom_map, rev_atom_map = self.mapper.get_atom_map()
         angle_signs = [1.0 for _ in clauses]
@@ -102,7 +117,7 @@ class Max3satQaoaExecutor:
                 self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][0], np.pi, 0.0, 0.0))
                 self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][1], np.pi, 0.0, 0.0))
 
-    def _add_single_qubit_terms(self, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]]):
+    def _add_linear_terms(self, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]]):
         atom_map, rev_atom_map = self.mapper.get_atom_map()
         slm_qubit_errors = self._get_slm_qubit_errors(aod_pairs, slm_atoms, clauses)
         for i, clause in enumerate(clauses):
@@ -110,14 +125,8 @@ class Max3satQaoaExecutor:
             slm_term = -literal_sign[rev_atom_map[slm_atoms[i].id]]
             if slm_term != slm_qubit_errors[i]:
                 self.linear_terms[slm_atoms[i].id] += slm_term - slm_qubit_errors[i]
-                #factor = term - slm_qubit_errors[i]
-                #self.program.add_instruction(LocalRaman(self.fpqa, slm_atoms[i], factor * 2.0 * parameter, 0.0, 0.0))  
             self.linear_terms[aod_pairs[i][0].id] += -literal_sign[rev_atom_map[aod_pairs[i][0].id]]
             self.linear_terms[aod_pairs[i][1].id] += -literal_sign[rev_atom_map[aod_pairs[i][1].id]]
-            #term = -literal_sign[rev_atom_map[aod_pairs[i][0].id]]
-            #self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][0], term * 2.0 * parameter, 0.0, 0.0))
-            #term = -literal_sign[rev_atom_map[aod_pairs[i][1].id]]
-            #self.program.add_instruction(LocalRaman(self.fpqa, aod_pairs[i][1], term * 2.0 * parameter, 0.0, 0.0))
 
     def implement_single_qubit_terms(self, parameter: float):
         for atom in self.fpqa.atoms:
@@ -141,6 +150,7 @@ class Max3satQaoaExecutor:
             aod_atoms.append(tuple(aod_pair))
         ccnot_angle_signs = self._get_ccnot_angle_signs(aod_atoms, slm_atoms, clauses)
         cnot_angle_signs = self._get_cnot_angle_signs(aod_atoms, clauses)
+        self._add_quadratic_terms(aod_atoms, clauses)
         self._implement_ccnot_control(aod_atoms, slm_atoms, clauses)
         for atom in slm_atoms:
             self.program.add_instruction(LocalRaman(self.fpqa, atom, np.pi / 2.0, 0.0, np.pi))
@@ -160,7 +170,7 @@ class Max3satQaoaExecutor:
         self.program.add_instruction(Rydberg(self.fpqa))
         for atom1, atom2 in aod_atoms:
             self.program.add_instruction(LocalRaman(self.fpqa, atom2, np.pi / 2.0, 0.0, np.pi))
-        self._add_single_qubit_terms(aod_atoms, slm_atoms, clauses)
+        self._add_linear_terms(aod_atoms, slm_atoms, clauses)
         offset = self.fpqa.slm.traps[slm_atoms[0].row][slm_atoms[0].col].y - self.fpqa.aod.rows[0]
         self.program.add_instruction(Shuttle(self.fpqa, True, 0, offset))
         instructions = []

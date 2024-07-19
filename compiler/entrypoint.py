@@ -48,4 +48,7 @@ class Max3satQaoaCompiler:
         # TO-DO: Randomize parameter
         parameter = 0.2512 * np.pi
         self._qaoa_mixer(program, parameter)
+        for atom_pair in executor.quadratic_terms:
+            if abs(executor.quadratic_terms[atom_pair]) > 1:
+                print(atom_pair, executor.quadratic_terms[atom_pair])
         return program
