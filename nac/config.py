@@ -4,7 +4,7 @@ defaults = {
     "U3_GATE_DURATION": 0.5, # in microseconds
     "CZ_GATE_FIDELITY": 0.995,
     "CZ_GATE_DURATION": 0.2, # in microseconds
-    "CCZ_GATE_FIDELITY": 0.98,
+    "CCZ_GATE_FIDELITY": 0.99,
     "CCZ_GATE_DURATION": 1, # in microseconds
     "QUBIT_DECAY":  1e08, # t1 in microseconds 
     "QUBIT_DEPHASING": 1.5e06, # t2 in microseconds

@@ -7,6 +7,12 @@ class QAOA:
         if len(self.cost_operator) > 0:
             self.num_qubits = len(self.cost_operator[0][1])
 
+    def equal_superposition_circuit(self):
+        circuit = QuantumCircuit(self.num_qubits)
+        for i in range(self.num_qubits):
+            circuit.h(i)
+        return circuit
+
     def mixer_operator_circuit(self, parameter):
         circuit = QuantumCircuit(self.num_qubits)
         for i in range(self.num_qubits):
@@ -19,12 +25,14 @@ class QAOA:
             for i in range(len(qubits) - 1):
                 circuit.cx(qubits[i], qubits[i + 1])
             circuit.rz(2 * coeff * parameter, qubits[-1])
+            for i in reversed(range(1, len(qubits))):
+                circuit.cx(qubits[i - 1], qubits[i])
         return circuit
 
     def naive_qaoa_circuit(self, depth):
         cost_params = ParameterVector("phi", length=depth)
         mixer_params = ParameterVector("beta", length=depth)
-        circuit = QuantumCircuit(self.num_qubits)
+        circuit = self.equal_superposition_circuit()
         for i in range(depth):
             circuit.compose(self.cost_operator_circuit(cost_params[i]), inplace=True)
             circuit.compose(self.mixer_operator_circuit(mixer_params[i]), inplace=True)

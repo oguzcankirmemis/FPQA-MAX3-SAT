@@ -46,7 +46,7 @@ class Max3satQaoaCompiler:
             executor.execute_color(color, parameter)
         executor.implement_linear_terms(parameter)
         # TO-DO: Randomize parameter
-        parameter = 0.2512 * np.pi
+        parameter = 0.1235 * np.pi
         self._qaoa_mixer(program, parameter)
         for atom_pair in executor.quadratic_terms:
             if abs(executor.quadratic_terms[atom_pair]) > 1:

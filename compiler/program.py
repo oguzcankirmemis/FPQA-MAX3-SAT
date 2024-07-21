@@ -1,4 +1,6 @@
 from nac.instructions.base import Instruction
+from nac.instructions.raman import LocalRaman, GlobalRaman
+from nac.instructions.rydberg import Rydberg
 from nac.instructions.aod_init import AODInit
 from nac.instructions.slm_init import SLMInit
 from nac.instructions.bind import Bind
@@ -54,6 +56,25 @@ class FPQAProgram:
         for instruction in self.instructions:
             duration += instruction.duration()
         return duration
+
+    def count_ops(self):
+        ops = {
+            "u3": 0,
+            "cz": 0,
+            "ccz": 0
+        }
+        for instruction in self.instructions:
+            if isinstance(instruction, LocalRaman):
+                ops["u3"] += 1
+            if isinstance(instruction, GlobalRaman):
+                ops["u3"] += len(self.fpqa.atoms)
+            if isinstance(instruction, Rydberg):
+                for gate in instruction.gates:
+                    if len(gate) == 2:
+                        ops["cz"] += 1
+                    if len(gate) == 3:
+                        ops["ccz"] += 1
+        return ops
         
     def write(self):
         pass
