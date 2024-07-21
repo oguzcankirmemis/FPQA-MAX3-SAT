@@ -27,12 +27,18 @@ class Max3satQaoaShuttler:
             for literal in self.formula.clauses[clause]:
                 participating_atoms.add(atom_map[abs(literal) - 1].id)
         trap_map = {}
+        max_slm_row = 0
         for clause in clauses:
             traps = clause_map[clause]
             literals = list(map(abs, self.formula.clauses[clause]))
             for i in range(len(literals)):
                 trap_map[literals[i]] = traps[i]
-        last_clause = clause_map[sorted_clauses[-1]]
+                max_slm_row = max(max_slm_row, traps[i][0])
+        last_clause = sorted(clause_map[sorted_clauses[-1]], key = lambda trap: trap[0])
+        if last_clause[0][1] > last_clause[1][1]:
+            tmp = last_clause[1]
+            last_clause[1] = last_clause[0]
+            last_clause[0] = last_clause[1]
         last_trap = self.fpqa.slm.traps[last_clause[1][0]][last_clause[1][1]]
         prev_trap = self.fpqa.slm.traps[last_clause[0][0]][last_clause[0][1]]
         prev_y = self.fpqa.aod.rows[0]
@@ -64,7 +70,7 @@ class Max3satQaoaShuttler:
                         instructions.append(instruction)
                         continue
                     instructions.append(instruction)
-                    if trap_map[literal][0] % 2 == 1:
+                    if trap_map[literal][0] != max_slm_row:
                         trap_switches_up.add(((0, c), (trap_map[literal][0], trap_map[literal][1])))
                     else:
                         trap_switches_down.add(((0, c), (trap_map[literal][0], trap_map[literal][1])))
@@ -95,7 +101,11 @@ class Max3satQaoaShuttler:
                 self.program.add_instruction(parallel)
             instruction = Shuttle(self.fpqa, True, 0, prev_y - self.fpqa.aod.rows[0])
             self.program.add_instruction(instruction)
-        first_clause = clause_map[sorted_clauses[0]]
+        first_clause = sorted(clause_map[sorted_clauses[0]], key = lambda trap: trap[0])
+        if first_clause[0][1] > first_clause[1][1]:
+            tmp = first_clause[1]
+            first_clause[1] = first_clause[0]
+            first_clause[0] = tmp
         first_trap = self.fpqa.slm.traps[first_clause[0][0]][first_clause[0][1]]
         instruction = Shuttle(self.fpqa, True, 0, first_trap.y - self.fpqa.aod.rows[0])
         self.program.add_instruction(instruction)

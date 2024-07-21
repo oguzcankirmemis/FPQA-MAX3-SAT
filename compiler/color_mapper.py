@@ -45,10 +45,19 @@ class Max3satQaoaMapper:
         c = ceil(2.0 * self.formula.nv / 3.0) + 1
         traps = self.fpqa.slm.traps
         clause_map = [None for _ in range(len(self.formula.clauses))]
+        aod_literals = {}
         for color in range(len(self.color_groups)):
             for clause in self.color_groups[color]:
                 literals = list(map(abs, self.formula.clauses[clause]))
                 clause_traps = (r, c), (r, c + 1), (r + 1, c + 1)
+                aod_pair = (0, 1)
+                if (literals[0], literals[2]) in aod_literals or (literals[2], literals[0]) in aod_literals:
+                    clause_traps = (r, c), (r + 1, c + 1), (r, c + 1)
+                    aod_pair = (0, 2)
+                elif (literals[1], literals[2]) in aod_literals or (literals[2], literals[1]) in aod_literals:
+                    clause_traps = (r + 1, c + 1), (r, c), (r, c + 1)  
+                    aod_pair = (1, 2)
+                aod_literals[(literals[aod_pair[0]], literals[aod_pair[1]])] = True
                 clause_map[clause] = clause_traps
                 c += 3
             r += 2

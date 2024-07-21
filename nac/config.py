@@ -1,10 +1,10 @@
 # hardware parameters based on Rubidium setup from https://iopscience.iop.org/article/10.1088/2058-9565/ad33ac
 defaults = {
-    "U3_GATE_FIDELITY": 0.995,
+    "U3_GATE_FIDELITY": 0.999,
     "U3_GATE_DURATION": 0.5, # in microseconds
-    "CZ_GATE_FIDELITY": 0.98,
+    "CZ_GATE_FIDELITY": 0.995,
     "CZ_GATE_DURATION": 0.2, # in microseconds
-    "CCZ_GATE_FIDELITY": 0.99,
+    "CCZ_GATE_FIDELITY": 0.98,
     "CCZ_GATE_DURATION": 1, # in microseconds
     "QUBIT_DECAY":  1e08, # t1 in microseconds 
     "QUBIT_DEPHASING": 1.5e06, # t2 in microseconds

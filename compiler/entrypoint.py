@@ -44,7 +44,7 @@ class Max3satQaoaCompiler:
         for color in range(num_colors):
             shuttler.shuttle_color(color)
             executor.execute_color(color, parameter)
-        executor.implement_single_qubit_terms(parameter)
+        executor.implement_linear_terms(parameter)
         # TO-DO: Randomize parameter
         parameter = 0.2512 * np.pi
         self._qaoa_mixer(program, parameter)
