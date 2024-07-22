@@ -5,6 +5,7 @@ from compiler.color_shuttler import Max3satQaoaShuttler
 from compiler.color_executor import Max3satQaoaExecutor
 from utils.sat_utils import get_color_map
 from nac.fpqa import FPQA
+from nac.config import FPQAConfig
 from nac.aod import AOD
 from nac.slm.triangular_layout import TriangularLayout
 from nac.config import FPQAConfig
@@ -14,8 +15,9 @@ import numpy as np
 
 
 class Max3satQaoaCompiler:
-    def __init__(self, formula: CNF):
+    def __init__(self, formula: CNF, config: None | FPQAConfig = None):
         self.formula = formula
+        self.config = config
 
     def _qaoa_equal_superposition(self, program: FPQAProgram):
         program.add_instruction(GlobalRaman(program.fpqa, np.pi / 2.0, 0.0, np.pi))
@@ -29,7 +31,7 @@ class Max3satQaoaCompiler:
         num_slm_cols = len(self.formula.clauses) * 3 + self.formula.nv * 2
         num_aod_rows = 1
         num_aod_cols = self.formula.nv
-        config = FPQAConfig({})
+        config = self.config
         aod = AOD(config.INTERACTION_RADIUS / 2.0, num_aod_rows, num_aod_cols)
         slm = TriangularLayout(config.INTERACTION_RADIUS, num_slm_rows, num_slm_cols)
         atoms = [Atom(i + 1, False, 0, i) for i in range(self.formula.nv)]

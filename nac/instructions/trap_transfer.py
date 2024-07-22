@@ -31,7 +31,7 @@ class TrapTransfer(Instruction):
         return True
 
     def qasm(self) -> str:
-        slm_index = self.slm_col * len(self.slm.traps) + self.slm_row
+        slm_index = self.slm_col * len(self.fpqa.slm.traps) + self.slm_row
         return f"@transfer {slm_index} ({self.aod_col}, {self.aod_row})\n"
 
     def avg_fidelity(self) -> float:
