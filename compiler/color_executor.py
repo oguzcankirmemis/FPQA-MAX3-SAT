@@ -72,12 +72,16 @@ class Max3satQaoaExecutor:
 
     def _avoid_implemented_quadratic_terms(self, aod_pairs: list[tuple[Atom, Atom]], clauses: list[list[int]]):
         instructions = []
+        aod_slm_quadratic_terms = self.mapper.get_aod_slm_quadratic_terms()
         atom_map, rev_atom_map = self.mapper.get_atom_map()
         for i, clause in enumerate(clauses):
             l1, l2 = rev_atom_map[aod_pairs[i][0].id], rev_atom_map[aod_pairs[i][1].id]
             if l1 > l2:
                 l2, l1 = l1, l2
-            if (l1, l2) not in self.quadratic_terms:
+            term = self.hamiltonian.quadratic_terms[l1 - 1][l2 - 1]
+            if (l1, l2) in aod_slm_quadratic_terms:
+                term -= aod_slm_quadratic_terms[(l1, l2)]
+            if (l1, l2) not in self.quadratic_terms and term != 0:
                 continue
             a1, a2 = aod_pairs[i][0], aod_pairs[i][1]
             if a1.col > a2.col:
@@ -90,6 +94,7 @@ class Max3satQaoaExecutor:
 
     def _implement_quadratic_terms(self, aod_pairs: list[tuple[Atom, Atom]], slm_atoms: list[Atom], clauses: list[list[int]], parameter: float):
         atom_map, rev_atom_map = self.mapper.get_atom_map()
+        aod_slm_quadratic_terms = self.mapper.get_aod_slm_quadratic_terms()
         pairs = []
         for i, clause in enumerate(clauses):
             l1, l2 = rev_atom_map[aod_pairs[i][0].id], rev_atom_map[aod_pairs[i][1].id]
@@ -98,9 +103,12 @@ class Max3satQaoaExecutor:
                 l2, l1 = l1, l2
             if (l1, l2) in self.quadratic_terms:
                 continue
-            angle = self.hamiltonian.quadratic_terms[l1 - 1][l2 - 1] * 2.0 * parameter
-            if angle == 0.0:
+            angle = self.hamiltonian.quadratic_terms[l1 - 1][l2 - 1]
+            if (l1, l2) in aod_slm_quadratic_terms:
+                angle -= aod_slm_quadratic_terms[(l1, l2)]
+            if angle == 0:
                 continue
+            angle = angle * 2.0 * parameter
             pairs.append((a1, a2, angle))
             self.quadratic_terms[(l1, l2)] = True
         if len(pairs) == 0:
@@ -151,8 +159,7 @@ class Max3satQaoaExecutor:
 
     def implement_linear_terms(self, parameter: float):
         for atom in self.fpqa.atoms:
-            self.program.add_instruction(LocalRaman(self.fpqa, atom, 0.0, 0.0, 2.0 * self.linear_terms[atom.id] * parameter))
-            
+            self.program.add_instruction(LocalRaman(self.fpqa, atom, 0.0, 0.0, 2.0 * self.linear_terms[atom.id] * parameter))            
     
     def execute_color(self, color: int, parameter: float):
         atom_map, rev_atom_map = self.mapper.get_atom_map()

@@ -63,6 +63,32 @@ class Max3satQaoaMapper:
             r += 2
         self.clause_map = clause_map
         return clause_map
+
+    def get_aod_slm_quadratic_terms(self) -> dict[tuple[int, int], int]:
+        if hasattr(self, "aod_slm_quadratic_terms"):
+            return self.aod_slm_quadratic_terms
+        quadratic_terms = {}
+        clause_map = self.get_clause_map()
+        for color in range(len(self.color_groups)):
+            for clause in self.color_groups[color]:
+                literals = list(map(abs, self.formula.clauses[clause]))
+                literal_signs = list(map(lambda l: 1 if l > 0 else -1, self.formula.clauses[clause]))
+                clause_traps = clause_map[clause]
+                for i in range(len(clause_traps)):
+                    for j in range(i + 1, len(clause_traps)):
+                        (r1, c1), (r2, c2) = clause_traps[i], clause_traps[j]
+                        if r1 == r2:
+                            continue
+                        term = literal_signs[i] * literal_signs[j]
+                        l1, l2 = literals[i], literals[j]
+                        if l1 > l2:
+                            l2, l1 = l1, l2
+                        if (l1, l2) not in quadratic_terms:
+                            quadratic_terms[(l1, l2)] = 0
+                        quadratic_terms[(l1, l2)] += term
+        self.aod_slm_quadratic_terms = quadratic_terms
+        return quadratic_terms
+                        
             
                     
         
