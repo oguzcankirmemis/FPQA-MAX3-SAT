@@ -25,4 +25,10 @@ class FPQAConfig:
                 setattr(self, key, config[key])
             else:
                 setattr(self, key, defaults[key])
+
+    def to_string(self):
+        config = {}
+        for key in defaults:
+            config[key] = getattr(self, key)
+        return str(config)
                 
