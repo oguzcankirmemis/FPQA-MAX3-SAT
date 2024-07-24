@@ -8,21 +8,33 @@ class Max3satHamiltonian:
             self.formula = formula
         else:
             self.formula = CNF(from_file=file)
-        self.single_terms = np.zeros(self.formula.nv)
-        self.quadratic_terms = np.zeros((self.formula.nv, self.formula.nv))
-        self.cubic_terms = np.zeros((self.formula.nv, self.formula.nv, self.formula.nv))
+        self.single_map = {}
+        self.quadratic_map = {}
+        self.cubic_map = {}
         for clause in self.formula.clauses:
             variables = np.sort(np.abs(clause)) - 1
             signs = np.sign([clause[i] for i in np.argsort(np.abs(clause))])
             for i in range(len(variables)):
                 v_i = variables[i]
-                self.single_terms[v_i] += -signs[i]
+                if v_i not in self.single_map:
+                    self.single_map[v_i] = 0
+                self.single_map[v_i] += -signs[i]
+                if self.single_map[v_i] == 0:
+                    self.single_map.pop(v_i)
                 for j in range(i + 1, len(variables)):
                     v_j = variables[j]
-                    self.quadratic_terms[v_i][v_j] += -(signs[i] * signs[j])
+                    if (v_i, v_j) not in self.quadratic_map:
+                        self.quadratic_map[(v_i, v_j)] = 0
+                    self.quadratic_map[(v_i, v_j)] += -(signs[i] * signs[j])
+                    if self.quadratic_map[(v_i, v_j)] == 0:
+                        self.quadratic_map.pop((v_i, v_j))
                     for k in range(j + 1, len(variables)):
                         v_k = variables[k]
-                        self.cubic_terms[v_i][v_j][v_k] += -(signs[i] * signs[j] * signs[k])
+                        if (v_i, v_j, v_k) not in self.cubic_map:
+                            self.cubic_map[(v_i, v_j, v_k)] = 0
+                        self.cubic_map[(v_i, v_j, v_k)] += -(signs[i] * signs[j] * signs[k])
+                        if self.cubic_map[(v_i, v_j, v_k)] == 0:
+                            self.cubic_map.pop((v_i, v_j, v_k))
 
     def __pauli_string(self, indices):
         pauli_string = ["I"] * self.formula.nv
@@ -33,17 +45,17 @@ class Max3satHamiltonian:
     def get_pauli_list(self):
         pauli_list = []
         for i in range(self.formula.nv):
-            if self.single_terms[i] != 0:
+            if i in self.single_map:
                 substring = self.__pauli_string([i])
-                pauli_list.append((self.single_terms[i], substring, (i, )))
+                pauli_list.append((self.single_map[i], substring, (i, )))
             for j in range(i + 1, self.formula.nv):
-                if self.quadratic_terms[i][j] != 0:
+                if (i, j) in self.quadratic_map:
                     substring = self.__pauli_string([i, j])
-                    pauli_list.append((self.quadratic_terms[i][j], substring, (i, j)))
+                    pauli_list.append((self.quadratic_terms[(i, j)], substring, (i, j)))
                 for k in range(j + 1, self.formula.nv):
-                    if self.cubic_terms[i][j][k] != 0:
+                    if (i, j, k) in self.cubic_map:
                         substring = self.__pauli_string([i, j, k])
-                        pauli_list.append((self.cubic_terms[i][j][k], substring, (i, j, k)))
+                        pauli_list.append((self.cubic_map[(i,j,k)], substring, (i, j, k)))
         return pauli_list
 
     def get_sparse_pauli_operator(self):

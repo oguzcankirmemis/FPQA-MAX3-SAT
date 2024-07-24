@@ -27,7 +27,6 @@ class Max3satQaoaCompiler:
 
     def compile_single_layer(self) -> FPQAProgram:
         num_colors, color_map = get_color_map(self.formula)
-        print(f"Coloring found, number of colors: {num_colors}")
         num_slm_rows = (num_colors + 1) * 2
         num_slm_cols = len(self.formula.clauses) * 3 + self.formula.nv * 2
         num_aod_rows = 1
@@ -45,7 +44,6 @@ class Max3satQaoaCompiler:
         # TO-DO: Randomize parameter
         parameter = 0.2512 * np.pi
         for color in range(num_colors):
-            print(f"Executing color: {color}")
             shuttler.shuttle_color(color)
             executor.execute_color(color, parameter)
         executor.implement_linear_terms(parameter)

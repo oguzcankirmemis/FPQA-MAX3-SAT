@@ -57,7 +57,7 @@ class Max3satQaoaShuttler:
             for c in reversed(range(len(self.fpqa.aod.cols))):
                 atom = self.fpqa.aod.get_atom_at_trap(c, 0)
                 if atom is None or atom.id not in participating_atoms:
-                    last_x -= 2 * self.fpqa.config.AOD_BEAM_PROXIMITY
+                    last_x -= self.fpqa.config.AOD_BEAM_PROXIMITY # 2 * self.fpqa.config.AOD_BEAM_PROXIMITY
                     instruction = Shuttle(self.fpqa, False, c, last_x - self.fpqa.aod.cols[c])
                     instructions.append(instruction)
                 else:
@@ -65,7 +65,7 @@ class Max3satQaoaShuttler:
                     trap = self.fpqa.slm.traps[trap_map[literal][0]][trap_map[literal][1]]
                     instruction = Shuttle(self.fpqa, False, c, trap.x - self.fpqa.aod.cols[c])
                     if trap.x > last_x:
-                        last_x -= 2 * self.fpqa.config.AOD_BEAM_PROXIMITY
+                        last_x -= self.fpqa.config.AOD_BEAM_PROXIMITY # 2 * self.fpqa.config.AOD_BEAM_PROXIMITY
                         instruction = Shuttle(self.fpqa, False, c, last_x - self.fpqa.aod.cols[c])
                         instructions.append(instruction)
                         continue
@@ -77,6 +77,7 @@ class Max3satQaoaShuttler:
                     num_shuttle -= 1
                     last_x = trap.x
             if len(trap_switches_up) == 0 and len(trap_switches_down) == 0:
+                print(last_x, trap.x)
                 raise ValueError("Something wrong occurred in shuttler!")
             parallel = Parallel(instructions)
             self.program.add_instruction(parallel)

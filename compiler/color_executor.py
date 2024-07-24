@@ -78,7 +78,9 @@ class Max3satQaoaExecutor:
             l1, l2 = rev_atom_map[aod_pairs[i][0].id], rev_atom_map[aod_pairs[i][1].id]
             if l1 > l2:
                 l2, l1 = l1, l2
-            term = self.hamiltonian.quadratic_terms[l1 - 1][l2 - 1]
+            term = 0
+            if (l1 - 1, l2 - 1) in self.hamiltonian.quadratic_map:
+                term = self.hamiltonian.quadratic_map[(l1 - 1, l2 - 1)]
             if (l1, l2) in aod_slm_quadratic_terms:
                 term -= aod_slm_quadratic_terms[(l1, l2)]
             if (l1, l2) not in self.quadratic_terms and term != 0:
@@ -103,7 +105,9 @@ class Max3satQaoaExecutor:
                 l2, l1 = l1, l2
             if (l1, l2) in self.quadratic_terms:
                 continue
-            angle = self.hamiltonian.quadratic_terms[l1 - 1][l2 - 1]
+            angle = 0
+            if (l1 - 1, l2 - 1) in self.hamiltonian.quadratic_map:
+                angle = self.hamiltonian.quadratic_map[(l1 - 1, l2 - 1)]
             if (l1, l2) in aod_slm_quadratic_terms:
                 angle -= aod_slm_quadratic_terms[(l1, l2)]
             if angle == 0:
