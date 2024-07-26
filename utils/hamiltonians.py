@@ -51,7 +51,7 @@ class Max3satHamiltonian:
             for j in range(i + 1, self.formula.nv):
                 if (i, j) in self.quadratic_map:
                     substring = self.__pauli_string([i, j])
-                    pauli_list.append((self.quadratic_terms[(i, j)], substring, (i, j)))
+                    pauli_list.append((self.quadratic_map[(i, j)], substring, (i, j)))
                 for k in range(j + 1, self.formula.nv):
                     if (i, j, k) in self.cubic_map:
                         substring = self.__pauli_string([i, j, k])
